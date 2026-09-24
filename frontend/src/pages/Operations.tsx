@@ -62,11 +62,11 @@ export default function Operations() {
 
   const fetchHistory = async () => {
     try {
-      const dashRes = await fetch('http://localhost:5001/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+      const dashRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
       if (dashRes.ok) setUserData(await dashRes.json());
       else { handleLogout(); return; }
 
-      const histRes = await fetch('http://localhost:5001/api/bank/history', { headers: { 'Authorization': `Bearer ${token}` } });
+      const histRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/history', { headers: { 'Authorization': `Bearer ${token}` } });
       if (histRes.ok) setTransactions(await histRes.json());
       
     } catch (error) { console.error(error); } finally { setLoading(false); }
@@ -91,7 +91,7 @@ export default function Operations() {
   const handleClearHistory = async () => {
     if (!window.confirm(t.confirmClear)) return;
     try {
-      const res = await fetch('http://localhost:5001/api/bank/history', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/history', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) { setTransactions([]); fetchHistory(); }
     } catch (e) { console.error(e); }
   };

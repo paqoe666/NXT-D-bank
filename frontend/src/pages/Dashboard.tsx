@@ -109,7 +109,7 @@ export default function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
       if (response.ok) {
         const data = await response.json();
         setUserData(data);
@@ -153,7 +153,7 @@ export default function Dashboard() {
 
       if (target && token) {
         try {
-          const res = await fetch(`http://localhost:5001/api/bank/resolve-recipient?target=${encodeURIComponent(target)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          const res = await fetch(`https://nxt-d-bank-backend.onrender.com/api/bank/resolve-recipient?target=${encodeURIComponent(target)}`, { headers: { 'Authorization': `Bearer ${token}` } });
           if (res.ok) {
             const data = await res.json();
             setRecipientName(data.name);
@@ -168,7 +168,7 @@ export default function Dashboard() {
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
-      const sse = new EventSource(`http://localhost:5001/api/bank/stream?token=${token}`);
+      const sse = new EventSource(`https://nxt-d-bank-backend.onrender.com/api/bank/stream?token=${token}`);
       sse.onmessage = (event) => {
         const data = JSON.parse(event.data);
         const currentSound = useStore.getState().sound;
@@ -188,12 +188,12 @@ export default function Dashboard() {
     if (newIndex < 0) newIndex = cardDesigns.length - 1;
     if (newIndex >= cardDesigns.length) newIndex = 0;
     setActiveDesignIndex(newIndex);
-    try { await fetch('http://localhost:5001/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); } catch (e) {}
+    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); } catch (e) {}
   };
 
   const handleMarkAllRead = async () => {
     setNotifications([]);
-    try { await fetch('http://localhost:5001/api/bank/notifications/read', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } }); } catch (e) {}
+    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/notifications/read', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } }); } catch (e) {}
   };
 
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,7 +213,7 @@ export default function Dashboard() {
     const finalTarget = transferTab === 'phone' ? `${selectedCountry.code}${transferData.rawPhone}` : transferData.cardOrAccount;
     
     try {
-      const response = await fetch('http://localhost:5001/api/bank/transfer', { 
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/transfer', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
         body: JSON.stringify({ receiverPhone: finalTarget, amount: Number(transferData.amount), comment: transferData.comment }) 

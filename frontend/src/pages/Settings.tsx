@@ -61,7 +61,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
         if (response.ok) {
           const data = await response.json();
           setUserData(data);
@@ -77,7 +77,7 @@ export default function Settings() {
   const handleCurrencyChange = async (newCurr: string) => {
     setCurrency(newCurr); setIsCurrOpen(false);
     if (userData) setUserData({ ...userData, account: { ...userData.account, currency: newCurr } });
-    try { await fetch('http://localhost:5001/api/bank/currency', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ currency: newCurr }) }); } catch (error) {}
+    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/currency', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ currency: newCurr }) }); } catch (error) {}
   };
 
   const playTestSound = (type: string) => {
@@ -108,7 +108,7 @@ export default function Settings() {
     if (passwordForm.new !== passwordForm.confirm) { setPassStatus(t.passMatchErr); return; }
     setPassStatus('...');
     try {
-      const response = await fetch('http://localhost:5001/api/bank/password', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ oldPassword: passwordForm.old, newPassword: passwordForm.new }) });
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/password', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ oldPassword: passwordForm.old, newPassword: passwordForm.new }) });
       const data = await response.json();
       if (response.ok) { setPassStatus('ok'); setTimeout(() => { setPassStatus(''); setPasswordForm({ old: '', new: '', confirm: '' }); }, 2000); } else { setPassStatus(data.message || 'Error'); }
     } catch (error) { setPassStatus('Error'); }
@@ -117,7 +117,7 @@ export default function Settings() {
   const handleCeoDeposit = async (e: React.FormEvent) => {
     e.preventDefault(); setCeoStatus('...');
     try {
-      const response = await fetch('http://localhost:5001/api/bank/deposit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ targetPhone: ceoPhone, amount: Number(ceoAmount) }) });
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ targetPhone: ceoPhone, amount: Number(ceoAmount) }) });
       if (response.ok) { setCeoStatus(`OK!`); setCeoPhone(''); setCeoAmount(''); setTimeout(() => setCeoStatus(''), 3000); } else setCeoStatus('Error');
     } catch (error) { setCeoStatus('Error'); }
   };
