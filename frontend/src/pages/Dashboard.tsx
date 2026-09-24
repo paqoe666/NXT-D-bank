@@ -1,0 +1,417 @@
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from '../store/useStore';
+import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const cardDesigns = [
+  { id: 'blue', classes: 'from-[#0A192F] via-[#112240] to-blue-900', name: 'Classic Blue' },
+  { id: 'orange', classes: 'from-orange-600 via-orange-500 to-yellow-500', name: 'Sunset Orange' },
+  { id: 'pink', classes: 'from-pink-600 via-rose-500 to-red-500', name: 'Neon Pink' },
+  { id: 'green', classes: 'from-emerald-700 via-emerald-500 to-teal-500', name: 'Forest Green' },
+  { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' }
+];
+
+const countries = [
+  { code: '+7', flag: '🇷🇺', name: 'Россия / Казахстан', length: 10, placeholder: '999 000 00 00' },
+  { code: '+375', flag: '🇧🇾', name: 'Беларусь', length: 9, placeholder: '99 000 00 00' },
+  { code: '+1', flag: '🇺🇸', name: 'США', length: 10, placeholder: '999 000 0000' },
+  { code: '+49', flag: '🇩🇪', name: 'Германия', length: 11, placeholder: '999 00000000' }
+];
+
+const translations = {
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario' }
+};
+
+export default function Dashboard() {
+  const { token, userData, setUserData, logout, language } = useStore();
+  const navigate = useNavigate();
+  const location = useLocation(); 
+  const [loading, setLoading] = useState(true);
+
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isBellHovered, setIsBellHovered] = useState(false);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
+  const [activeDesignIndex, setActiveDesignIndex] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [transferTab, setTransferTab] = useState<'phone' | 'card'>('phone');
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [transferData, setTransferData] = useState({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' });
+  const [transferStatus, setTransferStatus] = useState('');
+  
+  const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [toast, setToast] = useState<{title: string, message: string, transactionId?: string} | null>(null);
+  const t = translations[language] || translations.ru;
+
+  const handleNotificationClick = (txId?: string) => {
+    setIsNotifOpen(false);
+    setToast(null);
+    if (txId) navigate('/history', { state: { openTxId: txId } });
+    else navigate('/history');
+  };
+
+  const playNotificationSound = (type: string) => {
+    if (type === 'off') return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioContextClass();
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+
+      if (type === 's1') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start(); osc.stop(ctx.currentTime + 0.5);
+      } else if (type === 's2') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(400, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.start(); osc.stop(ctx.currentTime + 0.1);
+      } else if (type === 's3') {
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(600, ctx.currentTime); osc.frequency.setValueAtTime(800, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.15); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch (e) {
+      console.log('Звук заблокирован до клика');
+    }
+  };
+
+  const formatPhoneDisplay = (val: string) => {
+    let res = '';
+    for (let i = 0; i < val.length; i++) {
+      if (i === 3 || i === 6 || i === 8) res += ' ';
+      res += val[i];
+    }
+    return res;
+  };
+
+  const formatCardDisplay = (val: string) => val.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+
+  const getGreeting = (fullName: string) => {
+    const firstName = fullName?.split(' ')[0] || '';
+    const mskHour = new Date().getHours();
+    if (mskHour >= 6 && mskHour < 12) return `${t.morning}, ${firstName} 👋`;
+    if (mskHour >= 12 && mskHour < 18) return `${t.day}, ${firstName} 👋`;
+    if (mskHour >= 18) return `${t.evening}, ${firstName} 👋`;
+    return `${t.night}, ${firstName} 👋`;
+  };
+
+  const fetchDashboard = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data);
+        setActiveDesignIndex(data.cards?.[0]?.designIndex || 0);
+        setNotifications(data.notifications || []);
+      } else handleLogout();
+    } catch (error) { console.error(error); } finally { setLoading(false); }
+  };
+
+  // --- ЖЕЛЕЗОБЕТОННЫЙ ПЕРЕХВАТЧИК (Ожидает загрузки) ---
+  useEffect(() => {
+    // Выполняем только когда страница полностью загрузилась (!loading)
+    if (!loading && location.state?.repeatTx) {
+      const { target, amount } = location.state.repeatTx;
+      const safeTarget = target || '';
+      
+      setIsTransferModalOpen(true);
+
+      if (safeTarget.length >= 16 && !safeTarget.includes('+')) {
+        setTransferTab('card');
+        setTransferData(prev => ({ ...prev, cardOrAccount: safeTarget, amount: String(amount) }));
+      } else {
+        setTransferTab('phone');
+        const matchedCountry = countries.find(c => safeTarget.startsWith(c.code)) || countries[0];
+        setSelectedCountry(matchedCountry);
+        const rawPhone = safeTarget.replace(matchedCountry.code, '');
+        setTransferData(prev => ({ ...prev, rawPhone, amount: String(amount) }));
+      }
+
+      // Тихо стираем стейт роутера, чтобы при обновлении страницы (F5) окно не вылазило снова
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, loading]);
+  // -----------------------------------------------------
+
+  useEffect(() => {
+    const fetchRecipient = async () => {
+      const target = transferTab === 'phone' 
+        ? (transferData.rawPhone.length >= selectedCountry.length ? `${selectedCountry.code}${transferData.rawPhone}` : '')
+        : (transferData.cardOrAccount.length >= 16 ? transferData.cardOrAccount : '');
+
+      if (target && token) {
+        try {
+          const res = await fetch(`http://localhost:5001/api/bank/resolve-recipient?target=${encodeURIComponent(target)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (res.ok) {
+            const data = await res.json();
+            setRecipientName(data.name);
+          }
+        } catch (e) { setRecipientName(null); }
+      } else setRecipientName(null);
+    };
+    const delay = setTimeout(fetchRecipient, 300);
+    return () => clearTimeout(delay);
+  }, [transferData.rawPhone, transferData.cardOrAccount, transferTab, selectedCountry, token]);
+
+  useEffect(() => { 
+    if (token) {
+      fetchDashboard(); 
+      const sse = new EventSource(`http://localhost:5001/api/bank/stream?token=${token}`);
+      sse.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const currentSound = useStore.getState().sound;
+        playNotificationSound(currentSound);
+        setToast({ title: data.title, message: data.message, transactionId: data.transactionId });
+        setTimeout(() => setToast(null), 5000);
+        fetchDashboard();
+      };
+      return () => sse.close();
+    }
+  }, [token]);
+
+  const handleLogout = () => { logout(); navigate('/login'); };
+
+  const changeDesign = async (direction: number) => {
+    let newIndex = activeDesignIndex + direction;
+    if (newIndex < 0) newIndex = cardDesigns.length - 1;
+    if (newIndex >= cardDesigns.length) newIndex = 0;
+    setActiveDesignIndex(newIndex);
+    try { await fetch('http://localhost:5001/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); } catch (e) {}
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications([]);
+    try { await fetch('http://localhost:5001/api/bank/notifications/read', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } }); } catch (e) {}
+  };
+
+  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/\D/g, ''); 
+    if (val.length <= selectedCountry.length) setTransferData({ ...transferData, rawPhone: val });
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTransfer = async (e: React.FormEvent) => {
+    e.preventDefault(); 
+    setTransferStatus('...');
+    const finalTarget = transferTab === 'phone' ? `${selectedCountry.code}${transferData.rawPhone}` : transferData.cardOrAccount;
+    
+    try {
+      const response = await fetch('http://localhost:5001/api/bank/transfer', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+        body: JSON.stringify({ receiverPhone: finalTarget, amount: Number(transferData.amount), comment: transferData.comment }) 
+      });
+      
+      if (response.ok) {
+        setIsTransferModalOpen(false); 
+        setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
+        setTransferStatus(''); 
+      } else {
+        setTransferStatus('Ошибка');
+      }
+    } catch (error) { 
+      setTransferStatus('Ошибка сети'); 
+    }
+  };
+
+  if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
+  const currentDesign = cardDesigns[activeDesignIndex] || cardDesigns[0];
+
+  return (
+    <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
+      
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            onClick={() => handleNotificationClick(toast.transactionId)}
+            initial={{ opacity: 0, y: -50, scale: 0.9 }} 
+            animate={{ opacity: 1, y: 0, scale: 1 }} 
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-4 min-w-[320px] cursor-pointer hover:scale-[1.02] transition-transform"
+          >
+            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0"><Bell className="w-5 h-5" /></div>
+            <div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">{toast.title}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{toast.message}</p>
+            </div>
+            <button onClick={(e) => { e.stopPropagation(); setToast(null); }} className="ml-auto p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><X className="w-4 h-4"/></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
+        <div>
+          <div className="p-8 hidden md:block"><h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><span className="text-white text-sm font-bold">N</span></div>NXT-D</h1></div>
+          <nav className="p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
+            <button className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><CreditCard className="w-5 h-5" /> <span className="hidden md:inline">{t.dash}</span></button>
+            <button onClick={() => navigate('/history')} className="hover:bg-slate-100 dark:hover:bg-white/5 hover:text-blue-600 dark:hover:text-white px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><History className="w-5 h-5" /> <span className="hidden md:inline">{t.hist}</span></button>
+            <button onClick={() => navigate('/settings')} className="hover:bg-slate-100 dark:hover:bg-white/5 hover:text-blue-600 dark:hover:text-white px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><Settings className="w-5 h-5" /> <span className="hidden md:inline">{t.set}</span></button>
+          </nav>
+        </div>
+        <div className="p-4 hidden md:block">
+          <div className="bg-slate-50 dark:bg-[#112240] p-4 rounded-2xl flex items-center justify-between border border-slate-100 dark:border-slate-800"><div className="flex items-center gap-3 overflow-hidden"><div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div><div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div></div><button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition p-2"><LogOut className="w-5 h-5" /></button></div>
+        </div>
+      </aside>
+
+      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header className="md:hidden bg-white dark:bg-slate-800 p-4 flex justify-between items-center shadow-sm"><h1 className="text-xl font-black text-slate-900 dark:text-white">NXT-D</h1><button onClick={handleLogout} className="text-sm font-medium text-red-500"><LogOut className="w-5 h-5" /></button></header>
+        <div className="p-4 md:p-8 max-w-6xl w-full mx-auto relative">
+          <div className="flex justify-between items-end mb-8 relative">
+            <motion.h2 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{getGreeting(userData.client)}</motion.h2>
+            
+            <div className="relative z-40">
+              <button onMouseEnter={() => setIsBellHovered(true)} onMouseLeave={() => setIsBellHovered(false)} onClick={() => setIsNotifOpen(!isNotifOpen)} className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm relative text-slate-500 hover:text-blue-500 transition focus:outline-none"><motion.div animate={isBellHovered ? { rotate: [0, 15, -15, 15, -15, 0] } : {}} transition={{ duration: 0.5 }}><Bell className="w-6 h-6" /></motion.div>{notifications.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>}</button>
+              <AnimatePresence>
+                {isNotifOpen && (
+                  <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50"><h3 className="font-bold text-sm">{t.notif}</h3>{notifications.length > 0 && <button onClick={handleMarkAllRead} className="text-xs text-blue-500 font-medium hover:text-blue-700">{t.readAll}</button>}</div>
+                    
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? <div className="p-8 text-center text-slate-400 text-sm">{t.noNotif}</div> : notifications.map((notif: any) => (
+                        <div 
+                          key={notif.id} 
+                          onClick={() => handleNotificationClick(notif.transactionId)} 
+                          className="p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition cursor-pointer"
+                        >
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{notif.message}</p>
+                          <p className="text-[10px] text-slate-400 mt-1">{new Date(notif.createdAt || Date.now()).toLocaleString(language === 'ru' ? 'ru-RU' : language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 flex flex-col gap-6">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}><div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none"></div><div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div><div className="relative z-10 flex justify-between items-start mb-10"><div><p className="text-white/80 text-sm font-medium mb-1">{t.acc}</p><h3 className="text-4xl md:text-5xl font-light tracking-tight">{userData.account?.balance.toLocaleString('ru-RU')} <span className="font-normal opacity-80">{userData.account?.currency}</span></h3></div><span className="text-2xl font-black tracking-widest opacity-90">NXT</span></div><div className="relative z-10 flex justify-between items-end"><div><p className="font-mono text-lg md:text-xl tracking-[0.15em] mb-1 drop-shadow-md">{userData.cards?.[0]?.number.match(/.{1,4}/g)?.join(' ')}</p><p className="text-sm text-white/80 uppercase tracking-widest">{userData.cards?.[0]?.ownerName}</p></div><div className="text-right flex flex-col items-end"><p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p><div className="flex -space-x-3"><div className="w-10 h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-10 h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div></motion.div>
+            </div>
+            <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p><button onClick={() => setIsTransferModalOpen(true)} className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20">{t.newTrans}</button></div></div>
+          </div>
+        </div>
+      </main>
+
+      <AnimatePresence>
+        {isCardModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><CreditCard className="w-6 h-6 text-blue-500" /> {t.cardManage}</h2>
+                <button onClick={() => setIsCardModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 bg-slate-50 dark:bg-slate-900/50 flex-1 overflow-y-auto">
+                <div className="relative flex items-center justify-center mb-6 group">
+                  <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
+                  <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}><div className="absolute inset-0 bg-white/5"></div><div className="flex justify-between items-start mb-6 relative z-10"><h3 className="text-xl font-light">{userData.account?.balance.toLocaleString('ru-RU')} {userData.account?.currency}</h3><span className="font-bold">NXT</span></div><div className="flex justify-between items-end relative z-10"><div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div><div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div>
+                  <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="relative group cursor-not-allowed">
+                    <button disabled className="w-full flex flex-col items-center p-3 bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 rounded-xl opacity-60 pointer-events-none"><Lock className="w-6 h-6 mb-2 text-slate-400" /><span className="text-[10px] font-bold uppercase text-slate-500">{t.lock}</span></button>
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-xl z-50">{t.soon}<div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div></div>
+                  </div>
+                  <div className="relative group cursor-not-allowed">
+                    <button disabled className="w-full flex flex-col items-center p-3 bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 rounded-xl opacity-60 pointer-events-none"><Snowflake className="w-6 h-6 mb-2 text-slate-400" /><span className="text-[10px] font-bold uppercase text-slate-500">{t.freeze}</span></button>
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-xl z-50">{t.soon}<div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div></div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">{t.details}</h4>
+                  <div className="space-y-3">
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
+                      <span className="font-mono text-lg text-slate-700 dark:text-slate-200">{userData.cards?.[0]?.number.match(/.{1,4}/g)?.join(' ')}</span>
+                      <button onClick={() => copyToClipboard(userData.cards?.[0]?.number)} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title={t.copied}>{copied ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5 text-slate-400 hover:text-blue-500 transition" />}</button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center"><span className="font-mono text-lg text-slate-700 dark:text-slate-200">{userData.cards?.[0]?.expiryDate}</span><span className="text-xs text-slate-400 font-bold uppercase">{t.exp}</span></div>
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center group relative overflow-hidden"><span className="font-mono text-lg text-slate-700 dark:text-slate-200 opacity-0 group-hover:opacity-100 transition">{userData.cards?.[0]?.cvv}</span><span className="absolute left-4 font-mono text-lg text-slate-700 dark:text-slate-200 group-hover:opacity-0 transition">***</span><span className="text-xs text-slate-400 font-bold uppercase z-10">CVV</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isTransferModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0"><h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.newTrans}</h2><button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button></div>
+              <div className="p-6 flex-1">
+                <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-6">
+                  <button onClick={() => setTransferTab('phone')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'phone' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><Smartphone className="w-4 h-4"/> {t.phone}</button>
+                  <button onClick={() => setTransferTab('card')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'card' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><CreditCard className="w-4 h-4"/> {t.card}</button>
+                </div>
+                <form onSubmit={handleTransfer}>
+                  
+                  <div className="mb-4">
+                    {transferTab === 'phone' ? (
+                      <div className="flex relative bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 transition">
+                        <div className="relative">
+                          <button type="button" onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)} className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 h-full px-4 border-r border-slate-200 dark:border-slate-700 rounded-l-xl"><span className="text-lg">{selectedCountry.flag}</span><span className="font-bold text-slate-900 dark:text-white">{selectedCountry.code}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                          {isCountryDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                              {countries.map(c => <button key={c.code} type="button" onClick={() => { setSelectedCountry(c); setIsCountryDropdownOpen(false); setTransferData({...transferData, rawPhone: ''}); }} className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700 text-left"><span className="text-xl">{c.flag}</span><div><p className="font-bold text-sm text-slate-900 dark:text-white">{c.code}</p><p className="text-xs text-slate-400">{c.name}</p></div></button>)}
+                            </div>
+                          )}
+                        </div>
+                        <input type="text" placeholder={selectedCountry.placeholder} value={formatPhoneDisplay(transferData.rawPhone)} onChange={handlePhoneInput} className="w-full bg-transparent p-4 outline-none text-lg font-medium text-slate-900 dark:text-white" required />
+                      </div>
+                    ) : (
+                      <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(transferData.cardOrAccount)} onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white" required />
+                    )}
+                    
+                    <AnimatePresence>
+                      {recipientName && (
+                        <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 12 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
+                          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 p-3 rounded-xl"><div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">{recipientName.charAt(0)}</div><div><p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{t.recipientFound}</p><p className="text-sm font-bold text-slate-900 dark:text-white">{recipientName}</p></div><CheckCircle2 className="w-5 h-5 text-blue-500 ml-auto" /></div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.amount}</label>
+                    <div className="relative"><input type="number" placeholder="0" value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-16 rounded-xl outline-none font-medium text-slate-900 dark:text-white" required /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{userData.account.currency}</span></div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.comment}</label>
+                    <div className="relative"><FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" /><input type="text" value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-xl outline-none text-slate-900 dark:text-white" /></div>
+                  </div>
+
+                  <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${transferData.amount} ${userData.account.currency}` : ''}</button>
+                  {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

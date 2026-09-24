@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  phone     String   @unique
+  login     String   @unique
+  password  String
+  
+  // Новые поля для версии 1.0
+  role      String   @default("user") // 'user' или 'ceo'
+  theme     String   @default("light")
+  language  String   @default("ru")
+  
+  account       Account?
+  cards         Card[]
+  sentTx        Transaction[] @relation("Sender")
+  receivedTx    Transaction[] @relation("Receiver")
+  notifications Notification[]
+  
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id       String @id @default(uuid())
+  balance  Float  @default(0)
+  currency String @default("RUB") // RUB, USD, EUR
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id         String  @id @default(uuid())
+  number     String  @unique
+  expiryDate String
+  cvv        String
+  ownerName  String
+  isBlocked  Boolean @default(false)
+  designIndex Int    @default(0) // <-- Добавили сохранение дизайна
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  type          String   // 'transfer' или 'deposit'
+  status        String   // 'completed', 'failed_not_found', 'pending'
+  amount        Float
+  totalDeducted Float    // Итоговая сумма списания (с учетом комиссии)
+  currency      String   @default("RUB")
+  commission    Float    @default(0)
+  
+  senderId      String?
+  sender        User?    @relation("Sender", fields: [senderId], references: [id])
+  
+  receiverId    String?
+  receiver      User?    @relation("Receiver", fields: [receiverId], references: [id])
+  
+  target        String?  // Указанный при переводе номер (телефона или карты)
+  comment       String?
+  
+  createdAt     DateTime @default(now())
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  message       String
+  type          String   @default("info")
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  userId        String
+  transactionId String?  // <-- ДОБАВИЛИ ЭТУ СТРОКУ
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
