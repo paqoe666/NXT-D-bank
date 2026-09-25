@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { LogOut, CreditCard, History, Settings, Search, ArrowUpRight, ArrowDownLeft, X, FileText, CheckCircle2, XCircle, Trash2, RefreshCw, Download } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { CreditCard, History, Settings, ArrowUpRight, ArrowDownLeft, X, CheckCircle2, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -14,15 +14,13 @@ const translations: Record<string, any> = {
 export default function Operations() {
   const { token, userData, setUserData, logout, language } = useStore();
   const navigate = useNavigate();
-  const location = useLocation(); 
   
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
-  const receiptRef = useRef<HTMLDivElement>(null); // Ссылка на скрытый шаблон чека А4
+  const receiptRef = useRef<HTMLDivElement>(null);
 
   const t = translations[language] || translations.ru;
   const rates: Record<string, number> = { 'RUB': 1, 'USD': 80, 'EUR': 100 };
@@ -65,7 +63,6 @@ export default function Operations() {
   const handleDownloadPDF = async () => {
     if (!receiptRef.current || !selectedTx) return;
     try {
-      // Делаем скриншот скрытого А4 элемента
       const canvas = await html2canvas(receiptRef.current, { scale: 2, useCORS: true });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -83,9 +80,6 @@ export default function Operations() {
     const isIncome = tx.receiverId === myId;
     if (filterType === 'income' && !isIncome) return false;
     if (filterType === 'expense' && isIncome) return false;
-    const query = searchQuery.toLowerCase();
-    const searchString = `${tx.target || ''} ${tx.comment || ''}`.toLowerCase();
-    if (searchQuery && !searchString.includes(query)) return false;
     return true;
   });
 
