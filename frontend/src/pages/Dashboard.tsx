@@ -20,9 +20,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes' }
 };
 
 export default function Dashboard() {
@@ -47,7 +47,9 @@ export default function Dashboard() {
   const [transferStatus, setTransferStatus] = useState('');
   
   const [recipientName, setRecipientName] = useState<string | null>(null);
-  const t = translations[language] || translations.ru;
+  const [recentRecipients, setRecentRecipients] = useState<any[]>([]); // Стейт для недавних
+  
+  const t = translations[language as keyof typeof translations] || translations.ru;
 
   const handleNotificationClick = (txId?: string) => {
     setIsNotifOpen(false);
@@ -85,6 +87,59 @@ export default function Dashboard() {
         setNotifications(data.notifications || []);
       } else handleLogout();
     } catch (error) { console.error(error); } finally { setLoading(false); }
+  };
+
+  // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ НЕДАВНИХ ПОЛУЧАТЕЛЕЙ
+  const fetchRecentRecipients = async () => {
+    if (!token || !userData?.account?.userId) return;
+    try {
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/history', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (response.ok) {
+        const history = await response.json();
+        const myId = userData.account.userId;
+        
+        // Оставляем только исходящие переводы
+        const outTx = history.filter((tx: any) => tx.senderId === myId && tx.status === 'completed');
+        
+        const uniqueRecipients = new Map();
+        
+        outTx.forEach((tx: any) => {
+          if (!uniqueRecipients.has(tx.target)) {
+            // Формируем имя: берем имя пользователя из БД, если его нет - то сам номер (с маской)
+            let displayName = 'Неизвестный';
+            let initial = '?';
+            
+            if (tx.receiver) {
+              displayName = `${tx.receiver.firstName} ${tx.receiver.lastName.charAt(0)}.`;
+              initial = tx.receiver.firstName.charAt(0);
+            } else {
+              displayName = tx.target.slice(-4); // Показываем последние 4 цифры
+              initial = '#';
+            }
+            
+            uniqueRecipients.set(tx.target, { target: tx.target, displayName, initial });
+          }
+        });
+        
+        // Берем 5 самых свежих уникальных получателей
+        setRecentRecipients(Array.from(uniqueRecipients.values()).slice(0, 5));
+      }
+    } catch (error) { console.error(error); }
+  };
+
+  // ПОДСТАНОВКА РЕКВИЗИТОВ ПРИ КЛИКЕ НА АВАТАРКУ
+  const handleSelectRecent = (target: string) => {
+    const isCard = target.length >= 16 && !target.includes('+');
+    if (isCard) {
+      setTransferTab('card');
+      setTransferData({ ...transferData, cardOrAccount: target });
+    } else {
+      setTransferTab('phone');
+      const matchedCountry = countries.find(c => target.startsWith(c.code)) || countries[0];
+      setSelectedCountry(matchedCountry);
+      const rawPhone = target.replace(matchedCountry.code, '');
+      setTransferData({ ...transferData, rawPhone });
+    }
   };
 
   useEffect(() => {
@@ -131,7 +186,8 @@ export default function Dashboard() {
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
-      const handleFocus = () => fetchDashboard();
+      fetchRecentRecipients(); // Загружаем недавних получателей при старте
+      const handleFocus = () => { fetchDashboard(); fetchRecentRecipients(); };
       window.addEventListener('focus', handleFocus);
       return () => window.removeEventListener('focus', handleFocus);
     }
@@ -179,6 +235,7 @@ export default function Dashboard() {
         setIsTransferModalOpen(false); 
         setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
         setTransferStatus(''); 
+        fetchRecentRecipients(); // Обновляем список недавних после успешного перевода
       } else {
         setTransferStatus('Ошибка');
       }
@@ -295,15 +352,36 @@ export default function Dashboard() {
       <AnimatePresence>
         {isTransferModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col">
-              <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0"><h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.newTrans}</h2><button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button></div>
-              <div className="p-6 flex-1">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.newTrans}</h2>
+                <button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="p-6 flex-1 overflow-y-auto">
+                
+                {/* БЛОК НЕДАВНИХ ПОЛУЧАТЕЛЕЙ */}
+                {recentRecipients.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">{t.recent}</h4>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                      {recentRecipients.map((rec, i) => (
+                        <button key={i} onClick={() => handleSelectRecent(rec.target)} className="flex flex-col items-center gap-2 shrink-0 group">
+                          <div className="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform">
+                            {rec.initial}
+                          </div>
+                          <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{rec.displayName}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-6">
                   <button onClick={() => setTransferTab('phone')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'phone' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><Smartphone className="w-4 h-4"/> {t.phone}</button>
                   <button onClick={() => setTransferTab('card')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'card' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><CreditCard className="w-4 h-4"/> {t.card}</button>
                 </div>
+                
                 <form onSubmit={handleTransfer}>
-                  
                   <div className="mb-4">
                     {transferTab === 'phone' ? (
                       <div className="flex relative bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus-within:ring-2 focus-within:ring-blue-500 transition">
