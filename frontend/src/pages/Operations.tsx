@@ -349,9 +349,11 @@ export default function Operations() {
       {selectedTx && (
         <div className="absolute left-[-10000px] top-[-10000px]">
           <div ref={receiptRef} className="w-[800px] bg-white p-12 text-black font-sans box-border relative">
+            
             <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-2xl tracking-tighter">NXT</div>
+                {/* ИСПРАВЛЕННЫЙ ЛОГОТИП БЕЗ ФЛЕКСБОКСА ДЛЯ КОРРЕКТНОГО РЕНДЕРА HTML2CANVAS */}
+                <div className="w-16 h-16 bg-blue-600 rounded-full text-white font-black text-2xl tracking-tighter text-center block" style={{ lineHeight: '64px' }}>NXT</div>
                 <div>
                   <h1 className="text-2xl font-bold text-blue-600 uppercase tracking-wide">NXT D-BANK</h1>
                   <p className="text-slate-500 text-sm mt-1">Официальное подтверждение операции</p>
@@ -366,6 +368,7 @@ export default function Operations() {
             <p className="text-slate-600 mb-10">Платежное поручение №{selectedTx.id.split('-')[0].toUpperCase()} от {formatDate(selectedTx.createdAt, false)}</p>
 
             <div className="grid grid-cols-2 gap-y-8 gap-x-12 mb-16">
+              
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Плательщик</p>
                 <p className="font-semibold text-lg">{selectedTx.sender ? `${selectedTx.sender.firstName} ${selectedTx.sender.lastName}` : 'Внутренний счет NXT'}</p>
@@ -409,6 +412,7 @@ export default function Operations() {
                 <div className="w-48 border-b border-black mb-1"></div>
                 <p className="text-xs text-slate-500">Документ сгенерирован автоматически</p>
               </div>
+
               <div className="absolute right-10 bottom-4 w-36 h-36 rounded-full border-4 border-blue-600/70 flex flex-col items-center justify-center text-blue-600/70 transform -rotate-12">
                 <div className="w-32 h-32 rounded-full border border-blue-600/70 flex flex-col items-center justify-center p-2 text-center">
                   <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">NXT D-Bank</span>
@@ -417,7 +421,11 @@ export default function Operations() {
                 </div>
               </div>
             </div>
-            <div className="mt-16 text-[10px] text-slate-400 text-center">Генеральная лицензия на осуществление банковских операций NXT D-Bank. Документ не требует мокрой печати.</div>
+
+            <div className="mt-16 text-[10px] text-slate-400 text-center">
+              Генеральная лицензия на осуществление банковских операций NXT D-Bank. Документ не требует мокрой печати.
+            </div>
+
           </div>
         </div>
       )}
