@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { LogOut, CreditCard, History, Settings as SettingsIcon, Moon, Sun, Globe, DollarSign, Lock, CheckCircle2, Crown, ChevronDown, Volume2, VolumeX } from 'lucide-react';
+import { LogOut, CreditCard, History, Settings as SettingsIcon, Moon, Sun, Globe, DollarSign, Lock, CheckCircle2, Crown, ChevronDown, Volume2, VolumeX, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const translations = {
@@ -12,7 +12,8 @@ const translations = {
     sound: 'Звук уведомлений', soundDesc: 'Мелодия при переводах',
     s1: 'Звоночек', s2: 'Мягкий клик', s3: 'Двойной сигнал', off: 'Без звука',
     sec: 'Безопасность', oldPass: 'Текущий пароль', newPass: 'Новый пароль', confPass: 'Повторите новый пароль',
-    updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно'
+    updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно',
+    changePin: 'Сбросить PIN-код', pinCleared: 'Сброшено! Установите новый на Главной.'
   },
   en: {
     dash: 'Dashboard', hist: 'History', set: 'Settings',
@@ -21,7 +22,8 @@ const translations = {
     sound: 'Notification Sound', soundDesc: 'Transfer alert melody',
     s1: 'Chime', s2: 'Soft Pop', s3: 'Double Beep', off: 'Muted',
     sec: 'Security', oldPass: 'Current password', newPass: 'New password', confPass: 'Confirm new password',
-    updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success'
+    updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success',
+    changePin: 'Reset PIN code', pinCleared: 'Reset! Set a new one on Dashboard.'
   },
   es: {
     dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes',
@@ -30,7 +32,8 @@ const translations = {
     sound: 'Sonido de notif.', soundDesc: 'Melodía de alerta',
     s1: 'Campana', s2: 'Clic suave', s3: 'Doble pitido', off: 'Silenciado',
     sec: 'Seguridad', oldPass: 'Contraseña actual', newPass: 'Nueva contraseña', confPass: 'Confirmar contraseña',
-    updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito'
+    updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito',
+    changePin: 'Restablecer PIN', pinCleared: '¡Restablecido! Configura uno nuevo en Inicio.'
   }
 };
 
@@ -42,6 +45,7 @@ export default function Settings() {
   const [currency, setCurrency] = useState('RUB');
   const [passwordForm, setPasswordForm] = useState({ old: '', new: '', confirm: '' });
   const [passStatus, setPassStatus] = useState('');
+  const [pinStatus, setPinStatus] = useState(''); // Стейт для статуса сброса PIN
   
   const [ceoPhone, setCeoPhone] = useState('');
   const [ceoAmount, setCeoAmount] = useState('');
@@ -56,7 +60,7 @@ export default function Settings() {
     try { userRole = JSON.parse(atob(token.split('.')[1])).role; } catch (e) {}
   }
 
-  const t = translations[language] || translations.ru;
+  const t = translations[language as keyof typeof translations] || translations.ru;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -120,6 +124,15 @@ export default function Settings() {
       const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ targetPhone: ceoPhone, amount: Number(ceoAmount) }) });
       if (response.ok) { setCeoStatus(`OK!`); setCeoPhone(''); setCeoAmount(''); setTimeout(() => setCeoStatus(''), 3000); } else setCeoStatus('Error');
     } catch (error) { setCeoStatus('Error'); }
+  };
+
+  // ФУНКЦИЯ СБРОСА PIN-КОДА
+  const handleResetPin = () => {
+    if (userData?.account?.userId) {
+      localStorage.removeItem(`pin_${userData.account.userId}`);
+      setPinStatus('ok');
+      setTimeout(() => setPinStatus(''), 4000);
+    }
   };
 
   if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
@@ -212,7 +225,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                {/* НОВЫЙ БЛОК: ЗВУК */}
+                {/* ЗВУК */}
                 <div className="flex items-center justify-between relative">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${sound === 'off' ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-slate-50 text-slate-500 dark:bg-slate-900'}`}>
@@ -244,6 +257,7 @@ export default function Settings() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
               <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none transition-colors duration-300">
                 <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white"><Lock className="w-5 h-5 text-blue-500" /> {t.sec}</h3>
+                
                 <form onSubmit={handlePasswordChange} className="space-y-4 mb-6">
                   <input type="password" placeholder={t.oldPass} value={passwordForm.old} onChange={(e) => setPasswordForm({...passwordForm, old: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" required />
                   <input type="password" placeholder={t.newPass} value={passwordForm.new} onChange={(e) => setPasswordForm({...passwordForm, new: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" required />
@@ -252,6 +266,17 @@ export default function Settings() {
                   {passStatus === 'ok' && <div className="p-3 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"><CheckCircle2 className="w-4 h-4"/> {t.passSuccess}</div>}
                   {passStatus && passStatus !== 'ok' && <div className="p-3 rounded-xl text-xs font-bold text-center bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">{passStatus}</div>}
                 </form>
+
+                {/* НОВАЯ КНОПКА СБРОСА PIN-КОДА */}
+                <button onClick={handleResetPin} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition font-bold text-sm mb-4">
+                  <KeyRound className="w-4 h-4" /> {t.changePin}
+                </button>
+                {pinStatus === 'ok' && (
+                  <div className="p-3 mb-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                    <CheckCircle2 className="w-4 h-4"/> {t.pinCleared}
+                  </div>
+                )}
+
                 <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition font-bold text-sm"><LogOut className="w-4 h-4" /> {t.logout}</button>
               </div>
             </motion.div>
@@ -260,4 +285,4 @@ export default function Settings() {
       </main>
     </div>
   );
-}
+}   
