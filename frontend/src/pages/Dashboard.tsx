@@ -20,9 +20,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!' }
 };
 
 export default function Dashboard() {
@@ -34,7 +34,7 @@ export default function Dashboard() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isBellHovered, setIsBellHovered] = useState(false);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // Стейт для модалки выхода
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
   const [copied, setCopied] = useState(false);
   
   const [activeDesignIndex, setActiveDesignIndex] = useState(0);
@@ -49,8 +49,82 @@ export default function Dashboard() {
   
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [recentRecipients, setRecentRecipients] = useState<any[]>([]); 
+
+  const [isPinSetupOpen, setIsPinSetupOpen] = useState(false);
+  const [pinStep, setPinStep] = useState<1 | 2>(1);
+  const [pinCode, setPinCode] = useState('');
+  const [pinConfirm, setPinConfirm] = useState('');
+  const [pinError, setPinError] = useState('');
   
   const t = translations[language as keyof typeof translations] || translations.ru;
+
+  useEffect(() => {
+    if (!userData?.account?.userId) return;
+    const checkPin = () => {
+      const savedPin = localStorage.getItem(`pin_${userData.account.userId}`);
+      if (!savedPin && !isPinSetupOpen) {
+        setIsPinSetupOpen(true);
+      }
+    };
+    const interval = setInterval(checkPin, 15000);
+    setTimeout(checkPin, 2000);
+    return () => clearInterval(interval);
+  }, [userData?.account?.userId, isPinSetupOpen]);
+
+  const handlePinPress = (num: string) => {
+    setPinError('');
+    if (pinStep === 1) {
+      setPinCode(prev => {
+        if (prev.length >= 4) return prev;
+        const newCode = prev + num;
+        if (newCode.length === 4) {
+          setTimeout(() => setPinStep(2), 300);
+        }
+        return newCode;
+      });
+    } else {
+      setPinConfirm(prev => {
+        if (prev.length >= 4) return prev;
+        const newConfirm = prev + num;
+        if (newConfirm.length === 4) {
+          if (newConfirm === pinCode) {
+            localStorage.setItem(`pin_${userData.account.userId}`, pinCode);
+            setTimeout(() => {
+              setIsPinSetupOpen(false);
+              setPinStep(1);
+              setPinCode('');
+              setPinConfirm('');
+            }, 500);
+          } else {
+            setPinError(t.pinMismatch);
+            return '';
+          }
+        }
+        return newConfirm;
+      });
+    }
+  };
+
+  const handlePinDelete = () => {
+    setPinError('');
+    if (pinStep === 1) setPinCode(prev => prev.slice(0, -1));
+    else setPinConfirm(prev => prev.slice(0, -1));
+  };
+
+  // Слушаем клавиатуру
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isPinSetupOpen) return;
+      if (/^[0-9]$/.test(e.key)) {
+        handlePinPress(e.key);
+      } else if (e.key === 'Backspace') {
+        handlePinDelete();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPinSetupOpen, pinStep, pinCode]);
+
 
   const handleNotificationClick = (txId?: string) => {
     setIsNotifOpen(false);
@@ -188,7 +262,6 @@ export default function Dashboard() {
     }
   }, [token]);
 
-  // ФУНКЦИЯ ДЛЯ КНОПКИ ВЫХОДА (ТЕПЕРЬ ПРОСТО ЗАКРЫВАЕТ МОДАЛКУ И РАЗЛОГИНИВАЕТ)
   const handleLogout = () => { 
     setIsLogoutModalOpen(false);
     logout(); 
@@ -246,6 +319,7 @@ export default function Dashboard() {
 
   if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
   const currentDesign = cardDesigns[activeDesignIndex] || cardDesigns[0];
+  const pinCurrentLength = pinStep === 1 ? pinCode.length : pinConfirm.length;
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
@@ -264,7 +338,6 @@ export default function Dashboard() {
               <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div>
               <div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div>
             </div>
-            {/* ТУТ МЫ ТЕПЕРЬ ОТКРЫВАЕМ МОДАЛКУ ВМЕСТО ПРЯМОГО ВЫХОДА */}
             <button onClick={() => setIsLogoutModalOpen(true)} className="text-slate-400 hover:text-red-500 transition p-2"><LogOut className="w-5 h-5" /></button>
           </div>
         </div>
@@ -273,7 +346,6 @@ export default function Dashboard() {
       <main className="flex-1 flex flex-col h-screen overflow-y-auto">
         <header className="md:hidden bg-white dark:bg-slate-800 p-4 flex justify-between items-center shadow-sm">
           <h1 className="text-xl font-black text-slate-900 dark:text-white">NXT-D</h1>
-          {/* И НА МОБИЛЬНЫХ ТОЖЕ ОТКРЫВАЕМ МОДАЛКУ */}
           <button onClick={() => setIsLogoutModalOpen(true)} className="text-sm font-medium text-red-500"><LogOut className="w-5 h-5" /></button>
         </header>
         <div className="p-4 md:p-8 max-w-6xl w-full mx-auto relative">
@@ -438,7 +510,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* --- ОКНО ПОДТВЕРЖДЕНИЯ ВЫХОДА --- */}
       <AnimatePresence>
         {isLogoutModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -460,6 +531,54 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* --- МОДАЛЬНОЕ ОКНО УСТАНОВКИ PIN-КОДА С КЛАВИАТУРОЙ --- */}
+      <AnimatePresence>
+        {isPinSetupOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-xs rounded-[2rem] shadow-2xl p-6 relative flex flex-col items-center">
+              
+              <button onClick={() => setIsPinSetupOpen(false)} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition">
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+                <Lock className="w-6 h-6" />
+              </div>
+              
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.pinTitle}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-6 h-10">
+                {pinError ? <span className="text-red-500 font-bold">{pinError}</span> : (pinStep === 1 ? t.pinDesc1 : t.pinDesc2)}
+              </p>
+
+              {/* Точки ввода PIN */}
+              <div className="flex gap-4 justify-center mb-8">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className={`w-4 h-4 rounded-full transition-colors duration-300 ${i < pinCurrentLength ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                ))}
+              </div>
+
+              {/* Клавиатура */}
+              <div className="grid grid-cols-3 gap-4 mb-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                  <button key={num} onClick={() => handlePinPress(num.toString())} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">
+                    {num}
+                  </button>
+                ))}
+                <div />
+                <button onClick={() => handlePinPress('0')} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">
+                  0
+                </button>
+                <button onClick={handlePinDelete} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-red-500 text-2xl font-light hover:bg-red-50 dark:hover:bg-slate-700 transition active:scale-95 flex items-center justify-center">
+                  ⌫
+                </button>
+              </div>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
