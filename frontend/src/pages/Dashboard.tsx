@@ -20,9 +20,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir' }
 };
 
 export default function Dashboard() {
@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isBellHovered, setIsBellHovered] = useState(false);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // Стейт для модалки выхода
   const [copied, setCopied] = useState(false);
   
   const [activeDesignIndex, setActiveDesignIndex] = useState(0);
@@ -47,7 +48,7 @@ export default function Dashboard() {
   const [transferStatus, setTransferStatus] = useState('');
   
   const [recipientName, setRecipientName] = useState<string | null>(null);
-  const [recentRecipients, setRecentRecipients] = useState<any[]>([]); // Стейт для недавних
+  const [recentRecipients, setRecentRecipients] = useState<any[]>([]); 
   
   const t = translations[language as keyof typeof translations] || translations.ru;
 
@@ -85,11 +86,10 @@ export default function Dashboard() {
         setUserData(data);
         setActiveDesignIndex(data.cards?.[0]?.designIndex || 0);
         setNotifications(data.notifications || []);
-      } else handleLogout();
+      } else logout();
     } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
-  // ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ НЕДАВНИХ ПОЛУЧАТЕЛЕЙ
   const fetchRecentRecipients = async () => {
     if (!token || !userData?.account?.userId) return;
     try {
@@ -98,14 +98,11 @@ export default function Dashboard() {
         const history = await response.json();
         const myId = userData.account.userId;
         
-        // Оставляем только исходящие переводы
         const outTx = history.filter((tx: any) => tx.senderId === myId && tx.status === 'completed');
-        
         const uniqueRecipients = new Map();
         
         outTx.forEach((tx: any) => {
           if (!uniqueRecipients.has(tx.target)) {
-            // Формируем имя: берем имя пользователя из БД, если его нет - то сам номер (с маской)
             let displayName = 'Неизвестный';
             let initial = '?';
             
@@ -113,7 +110,7 @@ export default function Dashboard() {
               displayName = `${tx.receiver.firstName} ${tx.receiver.lastName.charAt(0)}.`;
               initial = tx.receiver.firstName.charAt(0);
             } else {
-              displayName = tx.target.slice(-4); // Показываем последние 4 цифры
+              displayName = tx.target.slice(-4); 
               initial = '#';
             }
             
@@ -121,13 +118,11 @@ export default function Dashboard() {
           }
         });
         
-        // Берем 5 самых свежих уникальных получателей
         setRecentRecipients(Array.from(uniqueRecipients.values()).slice(0, 5));
       }
     } catch (error) { console.error(error); }
   };
 
-  // ПОДСТАНОВКА РЕКВИЗИТОВ ПРИ КЛИКЕ НА АВАТАРКУ
   const handleSelectRecent = (target: string) => {
     const isCard = target.length >= 16 && !target.includes('+');
     if (isCard) {
@@ -186,14 +181,19 @@ export default function Dashboard() {
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
-      fetchRecentRecipients(); // Загружаем недавних получателей при старте
+      fetchRecentRecipients(); 
       const handleFocus = () => { fetchDashboard(); fetchRecentRecipients(); };
       window.addEventListener('focus', handleFocus);
       return () => window.removeEventListener('focus', handleFocus);
     }
   }, [token]);
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  // ФУНКЦИЯ ДЛЯ КНОПКИ ВЫХОДА (ТЕПЕРЬ ПРОСТО ЗАКРЫВАЕТ МОДАЛКУ И РАЗЛОГИНИВАЕТ)
+  const handleLogout = () => { 
+    setIsLogoutModalOpen(false);
+    logout(); 
+    navigate('/login'); 
+  };
 
   const changeDesign = async (direction: number) => {
     let newIndex = activeDesignIndex + direction;
@@ -235,7 +235,7 @@ export default function Dashboard() {
         setIsTransferModalOpen(false); 
         setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
         setTransferStatus(''); 
-        fetchRecentRecipients(); // Обновляем список недавних после успешного перевода
+        fetchRecentRecipients(); 
       } else {
         setTransferStatus('Ошибка');
       }
@@ -259,12 +259,23 @@ export default function Dashboard() {
           </nav>
         </div>
         <div className="p-4 hidden md:block">
-          <div className="bg-slate-50 dark:bg-[#112240] p-4 rounded-2xl flex items-center justify-between border border-slate-100 dark:border-slate-800"><div className="flex items-center gap-3 overflow-hidden"><div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div><div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div></div><button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition p-2"><LogOut className="w-5 h-5" /></button></div>
+          <div className="bg-slate-50 dark:bg-[#112240] p-4 rounded-2xl flex items-center justify-between border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div>
+              <div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div>
+            </div>
+            {/* ТУТ МЫ ТЕПЕРЬ ОТКРЫВАЕМ МОДАЛКУ ВМЕСТО ПРЯМОГО ВЫХОДА */}
+            <button onClick={() => setIsLogoutModalOpen(true)} className="text-slate-400 hover:text-red-500 transition p-2"><LogOut className="w-5 h-5" /></button>
+          </div>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header className="md:hidden bg-white dark:bg-slate-800 p-4 flex justify-between items-center shadow-sm"><h1 className="text-xl font-black text-slate-900 dark:text-white">NXT-D</h1><button onClick={handleLogout} className="text-sm font-medium text-red-500"><LogOut className="w-5 h-5" /></button></header>
+        <header className="md:hidden bg-white dark:bg-slate-800 p-4 flex justify-between items-center shadow-sm">
+          <h1 className="text-xl font-black text-slate-900 dark:text-white">NXT-D</h1>
+          {/* И НА МОБИЛЬНЫХ ТОЖЕ ОТКРЫВАЕМ МОДАЛКУ */}
+          <button onClick={() => setIsLogoutModalOpen(true)} className="text-sm font-medium text-red-500"><LogOut className="w-5 h-5" /></button>
+        </header>
         <div className="p-4 md:p-8 max-w-6xl w-full mx-auto relative">
           <div className="flex justify-between items-end mb-8 relative">
             <motion.h2 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{getGreeting(userData.client)}</motion.h2>
@@ -359,7 +370,6 @@ export default function Dashboard() {
               </div>
               <div className="p-6 flex-1 overflow-y-auto">
                 
-                {/* БЛОК НЕДАВНИХ ПОЛУЧАТЕЛЕЙ */}
                 {recentRecipients.length > 0 && (
                   <div className="mb-6">
                     <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">{t.recent}</h4>
@@ -422,6 +432,29 @@ export default function Dashboard() {
 
                   {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
                 </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- ОКНО ПОДТВЕРЖДЕНИЯ ВЫХОДА --- */}
+      <AnimatePresence>
+        {isLogoutModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogOut className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.logoutTitle}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.logoutDesc}</p>
+              <div className="flex gap-3">
+                <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 py-3 font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition">
+                  {t.cancel}
+                </button>
+                <button onClick={handleLogout} className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition">
+                  {t.logoutBtn}
+                </button>
               </div>
             </motion.div>
           </motion.div>
