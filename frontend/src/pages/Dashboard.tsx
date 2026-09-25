@@ -47,44 +47,12 @@ export default function Dashboard() {
   const [transferStatus, setTransferStatus] = useState('');
   
   const [recipientName, setRecipientName] = useState<string | null>(null);
-  const [toast, setToast] = useState<{title: string, message: string, transactionId?: string} | null>(null);
   const t = translations[language] || translations.ru;
 
   const handleNotificationClick = (txId?: string) => {
     setIsNotifOpen(false);
-    setToast(null);
     if (txId) navigate('/history', { state: { openTxId: txId } });
     else navigate('/history');
-  };
-
-  const playNotificationSound = (type: string) => {
-    if (type === 'off') return;
-    try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioContextClass();
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-
-      if (type === 's1') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
-        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        osc.start(); osc.stop(ctx.currentTime + 0.5);
-      } else if (type === 's2') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(400, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-        osc.start(); osc.stop(ctx.currentTime + 0.1);
-      } else if (type === 's3') {
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(600, ctx.currentTime); osc.frequency.setValueAtTime(800, ctx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.15); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-        osc.start(); osc.stop(ctx.currentTime + 0.3);
-      }
-    } catch (e) {
-      console.log('Звук заблокирован до клика');
-    }
   };
 
   const formatPhoneDisplay = (val: string) => {
@@ -119,9 +87,7 @@ export default function Dashboard() {
     } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
-  // --- ЖЕЛЕЗОБЕТОННЫЙ ПЕРЕХВАТЧИК (Ожидает загрузки) ---
   useEffect(() => {
-    // Выполняем только когда страница полностью загрузилась (!loading)
     if (!loading && location.state?.repeatTx) {
       const { target, amount } = location.state.repeatTx;
       const safeTarget = target || '';
@@ -138,12 +104,9 @@ export default function Dashboard() {
         const rawPhone = safeTarget.replace(matchedCountry.code, '');
         setTransferData(prev => ({ ...prev, rawPhone, amount: String(amount) }));
       }
-
-      // Тихо стираем стейт роутера, чтобы при обновлении страницы (F5) окно не вылазило снова
       window.history.replaceState({}, document.title);
     }
   }, [location.state, loading]);
-  // -----------------------------------------------------
 
   useEffect(() => {
     const fetchRecipient = async () => {
@@ -168,16 +131,9 @@ export default function Dashboard() {
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
-      const sse = new EventSource(`https://nxt-d-bank-backend.onrender.com/api/bank/stream?token=${token}`);
-      sse.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        const currentSound = useStore.getState().sound;
-        playNotificationSound(currentSound);
-        setToast({ title: data.title, message: data.message, transactionId: data.transactionId });
-        setTimeout(() => setToast(null), 5000);
-        fetchDashboard();
-      };
-      return () => sse.close();
+      const handleFocus = () => fetchDashboard();
+      window.addEventListener('focus', handleFocus);
+      return () => window.removeEventListener('focus', handleFocus);
     }
   }, [token]);
 
@@ -236,26 +192,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
-      
-      <AnimatePresence>
-        {toast && (
-          <motion.div 
-            onClick={() => handleNotificationClick(toast.transactionId)}
-            initial={{ opacity: 0, y: -50, scale: 0.9 }} 
-            animate={{ opacity: 1, y: 0, scale: 1 }} 
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-4 min-w-[320px] cursor-pointer hover:scale-[1.02] transition-transform"
-          >
-            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0"><Bell className="w-5 h-5" /></div>
-            <div>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">{toast.title}</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{toast.message}</p>
-            </div>
-            <button onClick={(e) => { e.stopPropagation(); setToast(null); }} className="ml-auto p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><X className="w-4 h-4"/></button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
         <div>
           <div className="p-8 hidden md:block"><h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><span className="text-white text-sm font-bold">N</span></div>NXT-D</h1></div>
@@ -405,6 +341,7 @@ export default function Dashboard() {
                   </div>
 
                   <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${transferData.amount} ${userData.account.currency}` : ''}</button>
+
                   {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
                 </form>
               </div>
