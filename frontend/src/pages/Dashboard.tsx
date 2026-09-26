@@ -69,7 +69,6 @@ export default function Dashboard() {
     return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
   };
 
-  // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР (без жестких размеров в icon) ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
@@ -552,29 +551,27 @@ export default function Dashboard() {
                         <input type="text" placeholder={selectedCountry.placeholder} value={formatPhoneDisplay(transferData.rawPhone)} onChange={handlePhoneInput} className="w-full bg-transparent p-4 outline-none text-lg font-medium text-slate-900 dark:text-white" required />
                       </div>
                     ) : (
-                      <div className="relative">
+                      <div className="relative flex-1">
                         <input 
                           type="text" 
                           placeholder="0000 0000 0000 0000" 
                           value={formatCardDisplay(transferData.cardOrAccount)} 
                           onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} 
-                          // --- ПЛАВНЫЙ СДВИГ ВПРАВО ЕСЛИ ЕСТЬ ЛОГОТИП (pl-[90px]) ---
-                          className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 py-4 pr-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-out ${transferCardSystem ? 'pl-[90px]' : 'pl-4'}`} 
+                          className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-14 pr-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-out ${transferCardSystem ? 'pl-[90px]' : 'pl-4'}`} 
                           required 
                         />
                         <AnimatePresence>
                           {transferCardSystem && (
                             <motion.div 
-                              // --- ПЛАВНЫЙ ВЫЕЗД СЛЕВА ---
-                              initial={{ opacity: 0, x: -10, scale: 0.9 }} 
-                              animate={{ opacity: 1, x: 0, scale: 1 }} 
-                              exit={{ opacity: 0, x: -10, scale: 0.9 }} 
-                              className={`absolute left-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg flex items-center justify-center shadow-sm ${transferCardSystem.style}`}
+                              initial={{ opacity: 0, x: -10, y: '-50%' }} 
+                              animate={{ opacity: 1, x: 0, y: '-50%' }} 
+                              exit={{ opacity: 0, x: -10, y: '-50%' }} 
+                              className={`absolute left-3 top-1/2 px-2.5 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${transferCardSystem.style}`}
                             >
                               {transferCardSystem.logo ? (
                                 <img src={transferCardSystem.logo} alt={transferCardSystem.name} className="h-4 object-contain" />
                               ) : (
-                                <span className={`text-[10px] leading-none uppercase tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
+                                <span className={`text-[11px] leading-none tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
                               )}
                             </motion.div>
                           )}
