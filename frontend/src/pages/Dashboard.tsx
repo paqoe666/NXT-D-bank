@@ -336,7 +336,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
       <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
         <div>
-          <div className="p-8 hidden md:block"><h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><span className="text-white text-sm font-bold">N</span></div>NXT-D</h1></div>
+          <div className="p-8 hidden md:block"><h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><img src="/logo.png" alt="NXT" className="w-10 h-10 object-contain drop-shadow-md" />NXT-D</h1></div>
           <nav className="p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
             <button className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><CreditCard className="w-5 h-5" /> <span className="hidden md:inline">{t.dash}</span></button>
             <button onClick={() => navigate('/history')} className="hover:bg-slate-100 dark:hover:bg-white/5 hover:text-blue-600 dark:hover:text-white px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><History className="w-5 h-5" /> <span className="hidden md:inline">{t.hist}</span></button>

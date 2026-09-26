@@ -187,7 +187,7 @@ export default function Operations() {
         <div>
           <div className="p-8 hidden md:block">
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><span className="text-white text-sm font-bold">N</span></div>
+              <img src="/logo.png" alt="NXT" className="w-10 h-10 object-contain drop-shadow-md" />
               NXT-D
             </h1>
           </div>
