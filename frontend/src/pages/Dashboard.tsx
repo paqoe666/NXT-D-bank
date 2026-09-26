@@ -58,6 +58,18 @@ export default function Dashboard() {
   
   const t = translations[language as keyof typeof translations] || translations.ru;
 
+  // --- ХЕЛПЕРЫ ДЛЯ ПРОБЕЛОВ ---
+  const formatMoney = (val: number | string | undefined) => {
+    if (val === undefined || val === null) return '0';
+    const num = Number(val);
+    return isNaN(num) ? String(val) : num.toLocaleString('ru-RU');
+  };
+
+  const formatTextNumbers = (text: string) => {
+    if (!text) return '';
+    return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
+  };
+
   useEffect(() => {
     if (!userData?.account?.userId) return;
     const checkPin = () => {
@@ -111,7 +123,6 @@ export default function Dashboard() {
     else setPinConfirm(prev => prev.slice(0, -1));
   };
 
-  // Слушаем клавиатуру
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isPinSetupOpen) return;
@@ -366,7 +377,8 @@ export default function Dashboard() {
                           onClick={() => handleNotificationClick(notif.transactionId)} 
                           className="p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition cursor-pointer"
                         >
-                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{notif.message}</p>
+                          {/* ПРИМЕНЯЕМ ФОРМАТИРОВАНИЕ К УВЕДОМЛЕНИЯМ */}
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{formatTextNumbers(notif.message)}</p>
                           <p className="text-[10px] text-slate-400 mt-1">{new Date(notif.createdAt || Date.now()).toLocaleString(language === 'ru' ? 'ru-RU' : language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                       ))}
@@ -380,7 +392,7 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}><div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none"></div><div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div><div className="relative z-10 flex justify-between items-start mb-10"><div><p className="text-white/80 text-sm font-medium mb-1">{t.acc}</p><h3 className="text-4xl md:text-5xl font-light tracking-tight">{userData.account?.balance.toLocaleString('ru-RU')} <span className="font-normal opacity-80">{userData.account?.currency}</span></h3></div><span className="text-2xl font-black tracking-widest opacity-90">NXT</span></div><div className="relative z-10 flex justify-between items-end"><div><p className="font-mono text-lg md:text-xl tracking-[0.15em] mb-1 drop-shadow-md">{userData.cards?.[0]?.number.match(/.{1,4}/g)?.join(' ')}</p><p className="text-sm text-white/80 uppercase tracking-widest">{userData.cards?.[0]?.ownerName}</p></div><div className="text-right flex flex-col items-end"><p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p><div className="flex -space-x-3"><div className="w-10 h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-10 h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div></motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}><div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none"></div><div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div><div className="relative z-10 flex justify-between items-start mb-10"><div><p className="text-white/80 text-sm font-medium mb-1">{t.acc}</p><h3 className="text-4xl md:text-5xl font-light tracking-tight">{formatMoney(userData.account?.balance)} <span className="font-normal opacity-80">{userData.account?.currency}</span></h3></div><span className="text-2xl font-black tracking-widest opacity-90">NXT</span></div><div className="relative z-10 flex justify-between items-end"><div><p className="font-mono text-lg md:text-xl tracking-[0.15em] mb-1 drop-shadow-md">{userData.cards?.[0]?.number.match(/.{1,4}/g)?.join(' ')}</p><p className="text-sm text-white/80 uppercase tracking-widest">{userData.cards?.[0]?.ownerName}</p></div><div className="text-right flex flex-col items-end"><p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p><div className="flex -space-x-3"><div className="w-10 h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-10 h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div></motion.div>
             </div>
             <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p><button onClick={() => setIsTransferModalOpen(true)} className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20">{t.newTrans}</button></div></div>
           </div>
@@ -398,7 +410,7 @@ export default function Dashboard() {
               <div className="p-6 bg-slate-50 dark:bg-slate-900/50 flex-1 overflow-y-auto">
                 <div className="relative flex items-center justify-center mb-6 group">
                   <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
-                  <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}><div className="absolute inset-0 bg-white/5"></div><div className="flex justify-between items-start mb-6 relative z-10"><h3 className="text-xl font-light">{userData.account?.balance.toLocaleString('ru-RU')} {userData.account?.currency}</h3><span className="font-bold">NXT</span></div><div className="flex justify-between items-end relative z-10"><div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div><div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div>
+                  <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}><div className="absolute inset-0 bg-white/5"></div><div className="flex justify-between items-start mb-6 relative z-10"><h3 className="text-xl font-light">{formatMoney(userData.account?.balance)} {userData.account?.currency}</h3><span className="font-bold">NXT</span></div><div className="flex justify-between items-end relative z-10"><div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div><div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div></div></div>
                   <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
                 </div>
                 
@@ -500,7 +512,8 @@ export default function Dashboard() {
                     <div className="relative"><FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" /><input type="text" value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-xl outline-none text-slate-900 dark:text-white" /></div>
                   </div>
 
-                  <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${transferData.amount} ${userData.account.currency}` : ''}</button>
+                  {/* ДОБАВЛЕН ФОРМАТ НА КНОПКУ */}
+                  <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${userData.account.currency}` : ''}</button>
 
                   {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
                 </form>
@@ -532,7 +545,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* --- МОДАЛЬНОЕ ОКНО УСТАНОВКИ PIN-КОДА С КЛАВИАТУРОЙ --- */}
       <AnimatePresence>
         {isPinSetupOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
@@ -551,14 +563,12 @@ export default function Dashboard() {
                 {pinError ? <span className="text-red-500 font-bold">{pinError}</span> : (pinStep === 1 ? t.pinDesc1 : t.pinDesc2)}
               </p>
 
-              {/* Точки ввода PIN */}
               <div className="flex gap-4 justify-center mb-8">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className={`w-4 h-4 rounded-full transition-colors duration-300 ${i < pinCurrentLength ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
                 ))}
               </div>
 
-              {/* Клавиатура */}
               <div className="grid grid-cols-3 gap-4 mb-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                   <button key={num} onClick={() => handlePinPress(num.toString())} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">

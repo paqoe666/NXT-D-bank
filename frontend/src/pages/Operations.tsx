@@ -32,6 +32,13 @@ export default function Operations() {
   const myId = userData?.account?.userId;
   const currentCurrency = userData?.account?.currency || 'RUB';
 
+  // --- ХЕЛПЕР ДЛЯ ПРОБЕЛОВ В ИСТОРИИ ---
+  const formatMoney = (val: number | string | undefined) => {
+    if (val === undefined || val === null) return '0';
+    const num = Number(val);
+    return isNaN(num) ? String(val) : num.toLocaleString('ru-RU');
+  };
+
   const calculateTxAmounts = (tx: any) => {
     const isIncome = tx.receiverId === myId;
     const txCurrency = tx.currency || tx.sender?.account?.currency || 'RUB';
@@ -205,14 +212,15 @@ export default function Operations() {
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><ArrowDownLeft className="w-6 h-6" /></div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t.income}</p>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">+{Math.round(stats.income * 100) / 100} <span className="text-emerald-500">{currentCurrency}</span></h3>
+                {/* ПРОБЕЛЫ В СТАТИСТИКЕ */}
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">+{formatMoney(stats.income)} <span className="text-emerald-500">{currentCurrency}</span></h3>
               </div>
             </div>
             <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none flex items-center gap-4 transition-colors">
               <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center"><ArrowUpRight className="w-6 h-6" /></div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t.expense}</p>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">-{Math.round(stats.expense * 100) / 100} <span className="text-red-500">{currentCurrency}</span></h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">-{formatMoney(stats.expense)} <span className="text-red-500">{currentCurrency}</span></h3>
               </div>
             </div>
           </div>
@@ -263,8 +271,9 @@ export default function Operations() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`font-bold text-base ${amountColor}`}>{amountSign}{finalAmount} {currentCurrency}</p>
-                          {finalComm > 0 && !isIncome && <p className="text-[11px] text-slate-400">{t.comm} {finalComm} {currentCurrency}</p>}
+                          {/* ПРОБЕЛЫ В СПИСКЕ */}
+                          <p className={`font-bold text-base ${amountColor}`}>{amountSign}{formatMoney(finalAmount)} {currentCurrency}</p>
+                          {finalComm > 0 && !isIncome && <p className="text-[11px] text-slate-400">{t.comm} {formatMoney(finalComm)} {currentCurrency}</p>}
                         </div>
                       </motion.div>
                     );
@@ -293,8 +302,9 @@ export default function Operations() {
                   <div className="flex items-center gap-1.5 mt-2 text-red-500 font-bold text-xs"><XCircle className="w-4 h-4" /> {t.fail}</div>
                 )}
                 
+                {/* ПРОБЕЛЫ В МОДАЛКЕ */}
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
-                  {selectedTx.receiverId === myId ? '+' : '-'}{selectedTx.finalAmount} {currentCurrency}
+                  {selectedTx.receiverId === myId ? '+' : '-'}{formatMoney(selectedTx.finalAmount)} {currentCurrency}
                 </h2>
               </div>
 
@@ -318,7 +328,7 @@ export default function Operations() {
                 {selectedTx.finalComm > 0 && (
                   <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
                     <span className="text-slate-500">{t.commission}</span>
-                    <span className="font-medium text-right text-slate-900 dark:text-white">{selectedTx.finalComm} {currentCurrency}</span>
+                    <span className="font-medium text-right text-slate-900 dark:text-white">{formatMoney(selectedTx.finalComm)} {currentCurrency}</span>
                   </div>
                 )}
                 {selectedTx.comment && (
@@ -349,10 +359,8 @@ export default function Operations() {
       {selectedTx && (
         <div className="absolute left-[-10000px] top-[-10000px]">
           <div ref={receiptRef} className="w-[800px] bg-white p-12 text-black font-sans box-border relative">
-            
             <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8">
               <div className="flex items-center gap-4">
-                {/* ИСПРАВЛЕННЫЙ ЛОГОТИП БЕЗ ФЛЕКСБОКСА ДЛЯ КОРРЕКТНОГО РЕНДЕРА HTML2CANVAS */}
                 <div className="w-16 h-16 bg-blue-600 rounded-full text-white font-black text-2xl tracking-tighter text-center block" style={{ lineHeight: '64px' }}>NXT</div>
                 <div>
                   <h1 className="text-2xl font-bold text-blue-600 uppercase tracking-wide">NXT D-BANK</h1>
@@ -368,7 +376,6 @@ export default function Operations() {
             <p className="text-slate-600 mb-10">Платежное поручение №{selectedTx.id.split('-')[0].toUpperCase()} от {formatDate(selectedTx.createdAt, false)}</p>
 
             <div className="grid grid-cols-2 gap-y-8 gap-x-12 mb-16">
-              
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Плательщик</p>
                 <p className="font-semibold text-lg">{selectedTx.sender ? `${selectedTx.sender.firstName} ${selectedTx.sender.lastName}` : 'Внутренний счет NXT'}</p>
@@ -377,8 +384,9 @@ export default function Operations() {
 
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Сумма платежа</p>
-                <p className="font-bold text-2xl">{selectedTx.finalAmount} {currentCurrency}</p>
-                {selectedTx.finalComm > 0 && <p className="text-sm text-slate-600 mt-1">Вкл. комиссию: {selectedTx.finalComm} {currentCurrency}</p>}
+                {/* ПРОБЕЛЫ В ПЕЧАТНОМ PDF ЧЕКЕ */}
+                <p className="font-bold text-2xl">{formatMoney(selectedTx.finalAmount)} {currentCurrency}</p>
+                {selectedTx.finalComm > 0 && <p className="text-sm text-slate-600 mt-1">Вкл. комиссию: {formatMoney(selectedTx.finalComm)} {currentCurrency}</p>}
               </div>
 
               <div>
@@ -412,7 +420,6 @@ export default function Operations() {
                 <div className="w-48 border-b border-black mb-1"></div>
                 <p className="text-xs text-slate-500">Документ сгенерирован автоматически</p>
               </div>
-
               <div className="absolute right-10 bottom-4 w-36 h-36 rounded-full border-4 border-blue-600/70 flex flex-col items-center justify-center text-blue-600/70 transform -rotate-12">
                 <div className="w-32 h-32 rounded-full border border-blue-600/70 flex flex-col items-center justify-center p-2 text-center">
                   <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">NXT D-Bank</span>
@@ -421,11 +428,7 @@ export default function Operations() {
                 </div>
               </div>
             </div>
-
-            <div className="mt-16 text-[10px] text-slate-400 text-center">
-              Генеральная лицензия на осуществление банковских операций NXT D-Bank. Документ не требует мокрой печати.
-            </div>
-
+            <div className="mt-16 text-[10px] text-slate-400 text-center">Генеральная лицензия на осуществление банковских операций NXT D-Bank. Документ не требует мокрой печати.</div>
           </div>
         </div>
       )}
