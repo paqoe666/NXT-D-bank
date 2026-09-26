@@ -69,19 +69,15 @@ export default function Dashboard() {
     return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
   };
 
-// --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ С ИНДИВИДУАЛЬНЫМ РАЗМЕРОМ ---
-// --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
+  // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР (без жестких размеров в icon) ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
-    
-    // N-Cards сделали текстом: logo: null. Задаем жирный курсив и красивый синий цвет (text-blue-200)
-    if (cleanNum.startsWith('7777')) return { name: 'N-Cards', logo: null, style: 'bg-blue-600 text-white', icon: 'text-blue-200 drop-shadow-md text-xl md:text-2xl font-black italic', customClass: '' };
-    
+    if (cleanNum.startsWith('7777')) return { name: 'N-Cards', logo: null, style: 'bg-blue-600 text-white', icon: 'text-blue-200 font-black italic drop-shadow-md', customClass: '' };
     if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; 
     if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; 
     if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-6 md:h-7' }; 
-    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'text-white text-sm md:text-base font-bold', customClass: '' };
+    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'text-white font-bold', customClass: '' };
     return null;
   };
 
@@ -434,12 +430,12 @@ export default function Dashboard() {
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
                     
                     {myCardSystem?.logo ? (
-  <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} />
-) : myCardSystem ? (
-  <div className={`tracking-wider ${myCardSystem.icon}`}>{myCardSystem.name}</div>
-) : (
-  <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-)}
+                      <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} />
+                    ) : myCardSystem ? (
+                      <div className={`tracking-wider text-xl md:text-2xl ${myCardSystem.icon}`}>{myCardSystem.name}</div>
+                    ) : (
+                      <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
+                    )}
 
                   </div>
                 </div>
@@ -468,12 +464,12 @@ export default function Dashboard() {
                       <div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div>
                       
                       {myCardSystem?.logo ? (
-  <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} />
-) : myCardSystem ? (
-  <div className={`text-xs tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
-) : (
-  <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-)}
+                        <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} />
+                      ) : myCardSystem ? (
+                        <div className={`tracking-wider text-sm ${myCardSystem.icon} scale-75 transform origin-bottom-right`}>{myCardSystem.name}</div>
+                      ) : (
+                        <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
+                      )}
 
                     </div>
                   </div>
@@ -562,16 +558,23 @@ export default function Dashboard() {
                           placeholder="0000 0000 0000 0000" 
                           value={formatCardDisplay(transferData.cardOrAccount)} 
                           onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} 
-                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-24 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition" 
+                          // --- ПЛАВНЫЙ СДВИГ ВПРАВО ЕСЛИ ЕСТЬ ЛОГОТИП (pl-[90px]) ---
+                          className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 py-4 pr-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-out ${transferCardSystem ? 'pl-[90px]' : 'pl-4'}`} 
                           required 
                         />
                         <AnimatePresence>
                           {transferCardSystem && (
-                            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className={`absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg flex items-center justify-center ${transferCardSystem.style}`}>
+                            <motion.div 
+                              // --- ПЛАВНЫЙ ВЫЕЗД СЛЕВА ---
+                              initial={{ opacity: 0, x: -10, scale: 0.9 }} 
+                              animate={{ opacity: 1, x: 0, scale: 1 }} 
+                              exit={{ opacity: 0, x: -10, scale: 0.9 }} 
+                              className={`absolute left-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg flex items-center justify-center shadow-sm ${transferCardSystem.style}`}
+                            >
                               {transferCardSystem.logo ? (
                                 <img src={transferCardSystem.logo} alt={transferCardSystem.name} className="h-4 object-contain" />
                               ) : (
-                                <span className={`text-[10px] uppercase tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
+                                <span className={`text-[10px] leading-none uppercase tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
                               )}
                             </motion.div>
                           )}
