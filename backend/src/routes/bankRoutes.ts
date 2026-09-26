@@ -1,6 +1,13 @@
 import { Router } from 'express';
-// Добавили resolveRecipient сюда 👇
-import { getDashboard, updateCardDesign, markNotificationsRead, updateCurrency, updatePassword, resolveRecipient } from '../controllers/bank';
+import { 
+  getDashboard, 
+  updateCardDesign, 
+  markNotificationsRead, 
+  updateCurrency, 
+  updatePassword, 
+  resolveRecipient,
+  updateCardName // <--- добавили этот метод
+} from '../controllers/bank';
 import { transferMoney, getHistory, clearHistory } from '../controllers/transaction';
 import { ceoDeposit } from '../controllers/ceoController';
 import { authenticateToken } from '../middlewares/authMiddleware';
@@ -13,7 +20,7 @@ router.use(authenticateToken);
 
 router.get('/stream', connectStream);
 router.get('/dashboard', getDashboard);
-router.get('/resolve-recipient', resolveRecipient); // <-- НОВЫЙ МАРШРУТ
+router.get('/resolve-recipient', resolveRecipient);
 router.post('/transfer', transferLimiter, transferMoney);
 router.get('/history', getHistory);
 router.delete('/history', clearHistory);
@@ -22,5 +29,6 @@ router.post('/card/design', updateCardDesign);
 router.post('/notifications/read', markNotificationsRead);
 router.post('/currency', updateCurrency);
 router.post('/password', updatePassword);
+router.post('/card/name', updateCardName); // <--- и новый маршрут
 
 export default router;
