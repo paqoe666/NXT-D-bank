@@ -431,11 +431,11 @@ export default function Dashboard() {
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
                     
                     {myCardSystem?.logo ? (
-  <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-5 md:h-6 object-contain opacity-80 mix-blend-overlay drop-shadow-sm" />
+  <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-8 md:h-10 object-contain drop-shadow-md" />
 ) : myCardSystem ? (
-  <div className={`text-xs md:text-sm tracking-wider opacity-80 font-bold mix-blend-overlay`}>{myCardSystem.name}</div>
+  <div className={`text-sm md:text-base tracking-wider font-bold`}>{myCardSystem.name}</div>
 ) : (
-  <div className="flex -space-x-3 opacity-80 mix-blend-overlay"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
+  <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
 )}
 
                   </div>
