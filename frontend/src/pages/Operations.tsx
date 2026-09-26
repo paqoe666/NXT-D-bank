@@ -32,7 +32,7 @@ export default function Operations() {
   const myId = userData?.account?.userId;
   const currentCurrency = userData?.account?.currency || 'RUB';
 
-  // --- ХЕЛПЕР ДЛЯ ПРОБЕЛОВ В ИСТОРИИ ---
+  // Хелпер для пробелов в Истории
   const formatMoney = (val: number | string | undefined) => {
     if (val === undefined || val === null) return '0';
     const num = Number(val);
@@ -69,6 +69,7 @@ export default function Operations() {
     };
   };
 
+  // Тихий фоновый запрос
   const fetchHistory = async () => {
     try {
       const dashRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
@@ -76,12 +77,37 @@ export default function Operations() {
       else { handleLogout(); return; }
 
       const histRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/history', { headers: { 'Authorization': `Bearer ${token}` } });
-      if (histRes.ok) setTransactions(await histRes.json());
-      
-    } catch (error) { console.error(error); } finally { setLoading(false); }
+      if (histRes.ok) {
+        const newData = await histRes.json();
+        setTransactions(newData);
+      }
+    } catch (error) { 
+      console.error(error); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  useEffect(() => { if (token) fetchHistory(); }, [token]);
+  // --- РЕАЛТАЙМ ОБНОВЛЕНИЕ ЗДЕСЬ ---
+  useEffect(() => { 
+    if (token) {
+      fetchHistory(); // Первый запрос при загрузке
+      
+      // Настраиваем тихий опрос каждые 5 секунд
+      const interval = setInterval(() => {
+        fetchHistory();
+      }, 5000);
+      
+      // Обновляем мгновенно, если пользователь свернул вкладку и вернулся
+      const handleFocus = () => fetchHistory();
+      window.addEventListener('focus', handleFocus);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', handleFocus);
+      };
+    }
+  }, [token]);
 
   useEffect(() => {
     if (transactions.length > 0 && autoOpenId) {
@@ -212,7 +238,6 @@ export default function Operations() {
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center"><ArrowDownLeft className="w-6 h-6" /></div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t.income}</p>
-                {/* ПРОБЕЛЫ В СТАТИСТИКЕ */}
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">+{formatMoney(stats.income)} <span className="text-emerald-500">{currentCurrency}</span></h3>
               </div>
             </div>
@@ -244,40 +269,49 @@ export default function Operations() {
                 <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8"><FileText className="w-12 h-12 mb-4 opacity-20" /><p className="font-medium">{t.notFound}</p></div>
               ) : (
                 <div className="space-y-1">
-                  {filteredTransactions.map((tx) => {
-                    const isIncome = tx.receiverId === myId;
-                    const amountSign = isIncome ? '+' : '-';
-                    const amountColor = isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white';
-                    
-                    let targetName = tx.target;
-                    if (isIncome && tx.sender) targetName = `${tx.sender.firstName} ${tx.sender.lastName}`;
-                    if (!isIncome && tx.receiver) targetName = `${tx.receiver.firstName} ${tx.receiver.lastName}`;
-                    if (tx.type === 'deposit') targetName = t.ceoDeposit;
+                  <AnimatePresence>
+                    {filteredTransactions.map((tx) => {
+                      const isIncome = tx.receiverId === myId;
+                      const amountSign = isIncome ? '+' : '-';
+                      const amountColor = isIncome ? 'text-emerald-500' : 'text-slate-900 dark:text-white';
+                      
+                      let targetName = tx.target;
+                      if (isIncome && tx.sender) targetName = `${tx.sender.firstName} ${tx.sender.lastName}`;
+                      if (!isIncome && tx.receiver) targetName = `${tx.receiver.firstName} ${tx.receiver.lastName}`;
+                      if (tx.type === 'deposit') targetName = t.ceoDeposit;
 
-                    const { finalAmount, finalComm } = calculateTxAmounts(tx);
+                      const { finalAmount, finalComm } = calculateTxAmounts(tx);
 
-                    return (
-                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={tx.id} onClick={() => setSelectedTx({ ...tx, finalAmount, finalComm })} className="p-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition flex items-center justify-between group">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncome ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500' : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400'}`}>
-                            {isIncome ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-sm text-slate-900 dark:text-white">{targetName || t.unknown}</h4>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[11px] text-slate-500 font-medium">{formatDate(tx.createdAt)}</span>
-                              {tx.status === 'failed_recipient_not_found' && <span className="text-[9px] bg-red-100 text-red-600 px-2 py-0.2 rounded-full font-bold">{t.err}</span>}
+                      return (
+                        <motion.div 
+                          key={tx.id} 
+                          initial={{ opacity: 0, y: -20, scale: 0.95 }} 
+                          animate={{ opacity: 1, y: 0, scale: 1 }} 
+                          exit={{ opacity: 0, height: 0 }}
+                          layout
+                          onClick={() => setSelectedTx({ ...tx, finalAmount, finalComm })} 
+                          className="p-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition flex items-center justify-between group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncome ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500' : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400'}`}>
+                              {isIncome ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-slate-900 dark:text-white">{targetName || t.unknown}</h4>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[11px] text-slate-500 font-medium">{formatDate(tx.createdAt)}</span>
+                                {tx.status === 'failed_recipient_not_found' && <span className="text-[9px] bg-red-100 text-red-600 px-2 py-0.2 rounded-full font-bold">{t.err}</span>}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          {/* ПРОБЕЛЫ В СПИСКЕ */}
-                          <p className={`font-bold text-base ${amountColor}`}>{amountSign}{formatMoney(finalAmount)} {currentCurrency}</p>
-                          {finalComm > 0 && !isIncome && <p className="text-[11px] text-slate-400">{t.comm} {formatMoney(finalComm)} {currentCurrency}</p>}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                          <div className="text-right">
+                            <p className={`font-bold text-base ${amountColor}`}>{amountSign}{formatMoney(finalAmount)} {currentCurrency}</p>
+                            {finalComm > 0 && !isIncome && <p className="text-[11px] text-slate-400">{t.comm} {formatMoney(finalComm)} {currentCurrency}</p>}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
@@ -302,7 +336,6 @@ export default function Operations() {
                   <div className="flex items-center gap-1.5 mt-2 text-red-500 font-bold text-xs"><XCircle className="w-4 h-4" /> {t.fail}</div>
                 )}
                 
-                {/* ПРОБЕЛЫ В МОДАЛКЕ */}
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
                   {selectedTx.receiverId === myId ? '+' : '-'}{formatMoney(selectedTx.finalAmount)} {currentCurrency}
                 </h2>
@@ -384,7 +417,6 @@ export default function Operations() {
 
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Сумма платежа</p>
-                {/* ПРОБЕЛЫ В ПЕЧАТНОМ PDF ЧЕКЕ */}
                 <p className="font-bold text-2xl">{formatMoney(selectedTx.finalAmount)} {currentCurrency}</p>
                 {selectedTx.finalComm > 0 && <p className="text-sm text-slate-600 mt-1">Вкл. комиссию: {formatMoney(selectedTx.finalComm)} {currentCurrency}</p>}
               </div>
