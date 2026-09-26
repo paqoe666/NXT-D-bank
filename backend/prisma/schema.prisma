@@ -38,15 +38,18 @@ model Account {
 }
 
 model Card {
-  id         String  @id @default(uuid())
-  number     String  @unique
-  expiryDate String
-  cvv        String
-  ownerName  String
-  isBlocked  Boolean @default(false)
-  designIndex Int    @default(0) // <-- Добавили сохранение дизайна
-  userId     String
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String  @id @default(uuid())
+  number      String  @unique
+  expiryDate  String
+  cvv         String
+  ownerName   String
+  
+  cardName    String  @default("Основной счет") // <--- ВОТ ЭТА НОВАЯ СТРОЧКА
+  
+  isBlocked   Boolean @default(false)
+  designIndex Int     @default(0)
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {

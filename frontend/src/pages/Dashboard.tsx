@@ -20,9 +20,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', nameOnCard: 'Имя на карте', saveBtn: 'Сохранить', changeBtn: 'Изменить' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', nameOnCard: 'Name on Card', saveBtn: 'Save', changeBtn: 'Change' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', nameOnCard: 'Nombre en tarjeta', saveBtn: 'Guardar', changeBtn: 'Cambiar' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar' }
 };
 
 export default function Dashboard() {
@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [activeDesignIndex, setActiveDesignIndex] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
 
-  // Стейты для редактирования имени карты
+  // Стейты для редактирования названия карты
   const [isEditingName, setIsEditingName] = useState(false);
   const [newCardName, setNewCardName] = useState('');
 
@@ -342,7 +342,7 @@ export default function Dashboard() {
     }
   };
 
-  // ФУНКЦИЯ ДЛЯ СОХРАНЕНИЯ НОВОГО ИМЕНИ
+  // ФУНКЦИЯ ДЛЯ СОХРАНЕНИЯ КАСТОМНОГО НАЗВАНИЯ КАРТЫ
   const handleSaveCardName = async () => {
     setIsEditingName(false);
     if (!newCardName.trim()) return;
@@ -352,14 +352,14 @@ export default function Dashboard() {
 
     // Мгновенно обновляем UI
     const updatedCards = [...userData.cards];
-    updatedCards[0] = { ...card, ownerName: newCardName.trim().toUpperCase() };
+    updatedCards[0] = { ...card, cardName: newCardName.trim() };
     setUserData({ ...userData, cards: updatedCards });
 
     try {
       await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ cardId: card.id, ownerName: newCardName.trim() })
+        body: JSON.stringify({ cardId: card.id, cardName: newCardName.trim() })
       });
     } catch (error) { console.error('Ошибка сохранения', error); }
   };
@@ -441,7 +441,8 @@ export default function Dashboard() {
                 <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div>
                 <div className="relative z-10 flex justify-between items-start mb-10">
                   <div>
-                    <p className="text-white/80 text-sm font-medium mb-1">{t.acc}</p>
+                    {/* ТУТ ТЕПЕРЬ ОТОБРАЖАЕТСЯ КАСТОМНОЕ НАЗВАНИЕ КАРТЫ */}
+                    <p className="text-white/80 text-sm font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
                     <h3 className="text-4xl md:text-5xl font-light tracking-tight">{formatMoney(userData.account?.balance)} <span className="font-normal opacity-80">{userData.account?.currency}</span></h3>
                   </div>
                   <span className="text-2xl font-black tracking-widest opacity-90">NXT</span>
@@ -484,7 +485,16 @@ export default function Dashboard() {
                   <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
                   <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
                     <div className="absolute inset-0 bg-white/5"></div>
-                    <div className="flex justify-between items-start mb-6 relative z-10"><h3 className="text-xl font-light">{formatMoney(userData.account?.balance)} {userData.account?.currency}</h3><span className="font-bold">NXT</span></div>
+                    
+                    {/* ТУТ ТОЖЕ ОТОБРАЖАЕТСЯ КАСТОМНОЕ НАЗВАНИЕ КАРТЫ */}
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                      <div>
+                        <p className="text-white/80 text-xs font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
+                        <h3 className="text-xl font-light">{formatMoney(userData.account?.balance)} {userData.account?.currency}</h3>
+                      </div>
+                      <span className="font-bold">NXT</span>
+                    </div>
+                    
                     <div className="flex justify-between items-end relative z-10">
                       <div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div>
                       
@@ -501,28 +511,28 @@ export default function Dashboard() {
                   <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
                 </div>
 
-                {/* --- НОВОЕ ПОЛЕ: РЕДАКТИРОВАНИЕ ИМЕНИ --- */}
+                {/* --- НОВОЕ ПОЛЕ: РЕДАКТИРОВАНИЕ НАЗВАНИЯ КАРТЫ --- */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">{t.nameOnCard}</h4>
+                  <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">{t.cardNameLabel}</h4>
                   <div className="bg-white dark:bg-slate-800 p-2 pl-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
                     {isEditingName ? (
                       <input 
                         type="text" 
                         value={newCardName}
-                        onChange={(e) => setNewCardName(e.target.value.toUpperCase())}
-                        className="bg-transparent outline-none text-slate-900 dark:text-white font-medium w-full uppercase"
-                        placeholder="ИМЯ ФАМИЛИЯ"
+                        onChange={(e) => setNewCardName(e.target.value)}
+                        className="bg-transparent outline-none text-slate-900 dark:text-white font-medium w-full"
+                        placeholder={t.acc}
                         maxLength={20}
                         autoFocus
                       />
                     ) : (
-                      <span className="font-medium text-slate-700 dark:text-slate-200 uppercase truncate pr-4">{userData.cards?.[0]?.ownerName}</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-200 truncate pr-4">{userData.cards?.[0]?.cardName || t.acc}</span>
                     )}
                     
                     {isEditingName ? (
                       <button onClick={handleSaveCardName} className="p-2 ml-2 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-xs shrink-0 transition hover:bg-blue-100 dark:hover:bg-blue-500/30">{t.saveBtn}</button>
                     ) : (
-                      <button onClick={() => { setNewCardName(userData.cards?.[0]?.ownerName || ''); setIsEditingName(true); }} className="p-2 ml-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition text-xs font-bold uppercase shrink-0">{t.changeBtn}</button>
+                      <button onClick={() => { setNewCardName(userData.cards?.[0]?.cardName || t.acc); setIsEditingName(true); }} className="p-2 ml-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition text-xs font-bold uppercase shrink-0">{t.changeBtn}</button>
                     )}
                   </div>
                 </div>

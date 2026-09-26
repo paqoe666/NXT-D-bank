@@ -103,14 +103,18 @@ export const resolveRecipient = async (req: AuthRequest, res: Response): Promise
 };
 
 // --- НОВЫЙ МЕТОД СОХРАНЕНИЯ ИМЕНИ КАРТЫ ---
+// --- ОБНОВЛЕННЫЙ МЕТОД СОХРАНЕНИЯ НАЗВАНИЯ КАРТЫ ---
 export const updateCardName = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { cardId, ownerName } = req.body;
-    if (!cardId || !ownerName) { res.status(400).json({ message: 'Нет данных' }); return; }
+    const { cardId, cardName } = req.body;
+    if (!cardId || !cardName) { 
+      res.status(400).json({ message: 'Нет данных' }); 
+      return; 
+    }
     
     await prisma.card.update({ 
       where: { id: cardId }, 
-      data: { ownerName: ownerName.toUpperCase() } 
+      data: { cardName } // Сохраняем любое слово, даже с маленькой буквы
     });
     
     res.json({ success: true });
