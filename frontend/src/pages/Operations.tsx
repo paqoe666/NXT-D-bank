@@ -32,11 +32,45 @@ export default function Operations() {
   const myId = userData?.account?.userId;
   const currentCurrency = userData?.account?.currency || 'RUB';
 
-  // Хелпер для пробелов в Истории
   const formatMoney = (val: number | string | undefined) => {
     if (val === undefined || val === null) return '0';
     const num = Number(val);
     return isNaN(num) ? String(val) : num.toLocaleString('ru-RU');
+  };
+
+  // Хелпер для определения платежной системы по номеру
+  const getCardSystem = (cardNumber: string) => {
+    if (!cardNumber) return null;
+    const cleanNum = cardNumber.replace(/\D/g, '');
+    if (cleanNum.startsWith('7777')) return 'N-Cards';
+    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return 'VISA';
+    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return 'MasterCard';
+    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return 'МИР';
+    if (cleanNum.length >= 16) return 'Счет';
+    return null;
+  };
+
+  // Умное форматирование участника (Имя Фамилия • 1234 (МИР))
+  const formatParticipant = (userObj: any, isMe: boolean, target: string, isReceiver: boolean) => {
+    let name = userObj ? `${userObj.firstName} ${userObj.lastName}` : (isReceiver ? target : 'NXT-D Bank');
+    if (!userObj && !isReceiver) name = 'NXT-D Bank';
+    
+    let cardNumber = '';
+    
+    if (isMe && userData?.cards?.[0]) {
+      cardNumber = userData.cards[0].number;
+    } else if (isReceiver && target && target.length >= 16 && !target.includes('+')) {
+      cardNumber = target;
+    }
+
+    if (cardNumber) {
+      const cleanNum = cardNumber.replace(/\D/g, '');
+      const system = getCardSystem(cleanNum) || 'Счет';
+      const last4 = cleanNum.slice(-4);
+      return `${name} • ${last4} (${system})`;
+    }
+
+    return name;
   };
 
   const calculateTxAmounts = (tx: any) => {
@@ -69,7 +103,6 @@ export default function Operations() {
     };
   };
 
-  // Тихий фоновый запрос
   const fetchHistory = async () => {
     try {
       const dashRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
@@ -88,17 +121,10 @@ export default function Operations() {
     }
   };
 
-  // --- РЕАЛТАЙМ ОБНОВЛЕНИЕ ЗДЕСЬ ---
   useEffect(() => { 
     if (token) {
-      fetchHistory(); // Первый запрос при загрузке
-      
-      // Настраиваем тихий опрос каждые 5 секунд
-      const interval = setInterval(() => {
-        fetchHistory();
-      }, 5000);
-      
-      // Обновляем мгновенно, если пользователь свернул вкладку и вернулся
+      fetchHistory();
+      const interval = setInterval(() => { fetchHistory(); }, 5000);
       const handleFocus = () => fetchHistory();
       window.addEventListener('focus', handleFocus);
       
@@ -350,14 +376,23 @@ export default function Operations() {
                   <span className="text-slate-500">{t.dateTime}</span>
                   <span className="font-medium text-right text-slate-900 dark:text-white">{formatDate(selectedTx.createdAt)}</span>
                 </div>
+                
+                {/* УМНЫЙ ОТПРАВИТЕЛЬ С КАРТОЙ */}
                 <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
-                  <span className="text-slate-500">{t.sender}</span>
-                  <span className="font-medium text-right text-slate-900 dark:text-white">{selectedTx.sender ? `${selectedTx.sender.firstName} ${selectedTx.sender.lastName}` : 'NXT-D Bank'}</span>
+                  <span className="text-slate-500 shrink-0">{t.sender}</span>
+                  <span className="font-medium text-right text-slate-900 dark:text-white break-words pl-2">
+                    {formatParticipant(selectedTx.sender, selectedTx.senderId === myId, selectedTx.target, false)}
+                  </span>
                 </div>
+                
+                {/* УМНЫЙ ПОЛУЧАТЕЛЬ С КАРТОЙ */}
                 <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
-                  <span className="text-slate-500">{t.receiver}</span>
-                  <span className="font-medium text-right text-slate-900 dark:text-white">{selectedTx.receiver ? `${selectedTx.receiver.firstName} ${selectedTx.receiver.lastName}` : selectedTx.target}</span>
+                  <span className="text-slate-500 shrink-0">{t.receiver}</span>
+                  <span className="font-medium text-right text-slate-900 dark:text-white break-words pl-2">
+                    {formatParticipant(selectedTx.receiver, selectedTx.receiverId === myId, selectedTx.target, true)}
+                  </span>
                 </div>
+
                 {selectedTx.finalComm > 0 && (
                   <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
                     <span className="text-slate-500">{t.commission}</span>
