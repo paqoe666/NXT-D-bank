@@ -28,8 +28,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Хеширование пароля
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Генерация данных виртуальной карты (срок действия 6 лет, как в ТЗ)
-    const cardNumber = '4' + Math.random().toString().slice(2, 17); // 16 цифр
+    // --- ИЗМЕНЕНО: ГЕНЕРАЦИЯ КАРТЫ СИСТЕМЫ N-CARDS (BIN 7777) ---
+    // Формируем 12 случайных цифр и добавляем их к нашему BIN '7777'
+    const randomDigits = Math.random().toString().slice(2, 14).padEnd(12, '0');
+    const cardNumber = '7777' + randomDigits; // Итого строго 16 цифр
+    
     const cvv = Math.floor(100 + Math.random() * 900).toString(); // 3 цифры
     const expiryYear = new Date().getFullYear() + 6;
     const expiryDate = `12/${expiryYear.toString().slice(-2)}`;
@@ -92,11 +95,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // В токен зашиваем не только ID, но и роль (понадобится для CEO)
-const token = jwt.sign(
-  { userId: user.id, role: user.role }, // (здесь могут быть твои переменные)
-  process.env.JWT_SECRET || 'nxt_super_secret', // <-- ЖЕСТКО ПРОПИСЫВАЕМ КЛЮЧ
-  { expiresIn: '24h' }
-);
+    const token = jwt.sign(
+      { userId: user.id, role: user.role }, 
+      process.env.JWT_SECRET || 'nxt_super_secret', 
+      { expiresIn: '24h' }
+    );
 
     res.json({ token, message: 'Успешный вход' });
   } catch (error) {
