@@ -70,15 +70,15 @@ export default function Dashboard() {
   };
 
  // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
+  // --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ С ИНДИВИДУАЛЬНЫМ РАЗМЕРОМ ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
-    // ЗДЕСЬ МЕНЯЕМ /logo.png на /ncards.svg
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '' };
-    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '' };
-    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '' };
-    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '' };
-    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold' };
+    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-10 md:h-12' }; // N-cards сделали больше
+    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; // Visa сделали меньше
+    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; // Mastercard средний
+    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-6 md:h-7' }; // Мир чуть меньше
+    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold', customClass: '' };
     return null;
   };
 
@@ -431,7 +431,7 @@ export default function Dashboard() {
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
                     
                     {myCardSystem?.logo ? (
-  <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-8 md:h-10 object-contain drop-shadow-md" />
+  <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} />
 ) : myCardSystem ? (
   <div className={`text-sm md:text-base tracking-wider font-bold`}>{myCardSystem.name}</div>
 ) : (
@@ -465,12 +465,12 @@ export default function Dashboard() {
                       <div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div>
                       
                       {myCardSystem?.logo ? (
-                        <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-6 object-contain drop-shadow-lg" />
-                      ) : myCardSystem ? (
-                        <div className={`text-xs tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
-                      ) : (
-                        <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-                      )}
+  <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} />
+) : myCardSystem ? (
+  <div className={`text-xs tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
+) : (
+  <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
+)}
 
                     </div>
                   </div>
