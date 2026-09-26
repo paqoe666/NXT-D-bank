@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { ShieldCheck, ArrowRight, UserPlus, LogIn, Lock } from 'lucide-react';
+import { ShieldCheck, ArrowRight, UserPlus, LogIn, Lock, CreditCard } from 'lucide-react';
+
+const cardSystems = [
+  { id: 'n-cards', label: 'N-cards' },
+  { id: 'visa', label: 'VISA' },
+  { id: 'mastercard', label: 'MasterCard' },
+  { id: 'mir', label: 'МИР' }
+];
 
 export default function Login() {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -21,7 +28,8 @@ export default function Login() {
     lastName: '',
     phone: '',
     login: '',
-    password: ''
+    password: '',
+    cardSystem: 'n-cards' // По умолчанию N-cards
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +116,6 @@ export default function Login() {
     setPinCode(prev => prev.slice(0, -1));
   };
 
-  // Слушаем клавиатуру
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isPinMode) return;
@@ -131,9 +138,7 @@ export default function Login() {
         
         <div className="relative z-10">
           <div className="text-4xl font-black text-white tracking-tight flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-              <span className="text-white text-xl">N</span>
-            </div>
+            <img src="/logo.png" alt="NXT" className="w-12 h-12 drop-shadow-md" />
             NXT<span className="text-blue-500">.</span>
           </div>
           <h2 className="text-5xl font-light text-white leading-tight mt-12">
@@ -193,6 +198,24 @@ export default function Login() {
                           value={formData.phone} onChange={handleChange}
                           className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 transition outline-none dark:text-white"
                         />
+                        
+                        {/* ВЫБОР ПЛАТЕЖНОЙ СИСТЕМЫ */}
+                        <div className="mt-2 mb-2">
+                          <p className="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-2"><CreditCard className="w-4 h-4"/> Выберите систему карты</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {cardSystems.map(sys => (
+                              <button 
+                                key={sys.id} 
+                                type="button" 
+                                onClick={() => setFormData({...formData, cardSystem: sys.id})}
+                                className={`p-3 rounded-xl border text-sm font-bold transition ${formData.cardSystem === sys.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                              >
+                                {sys.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
                       </motion.div>
                     )}
                   </AnimatePresence>

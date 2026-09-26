@@ -8,14 +8,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { firstName, lastName, phone, login, password } = req.body;
+    // ДОБАВИЛИ cardSystem
+    const { firstName, lastName, phone, login, password, cardSystem } = req.body;
 
     if (!firstName || !lastName || !phone || !login || !password) {
       res.status(400).json({ message: 'Все поля обязательны' });
       return;
     }
 
-    // Проверка существующих пользователей
     const existingUser = await prisma.user.findFirst({
       where: { OR: [{ phone }, { login }] }
     });
@@ -25,19 +25,24 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Хеширование пароля
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // --- ИЗМЕНЕНО: ГЕНЕРАЦИЯ КАРТЫ СИСТЕМЫ N-CARDS (BIN 7777) ---
-    // Формируем 12 случайных цифр и добавляем их к нашему BIN '7777'
-    const randomDigits = Math.random().toString().slice(2, 14).padEnd(12, '0');
-    const cardNumber = '7777' + randomDigits; // Итого строго 16 цифр
+    // --- ЛОГИКА ГЕНЕРАЦИИ ПО BIN ---
+    const bins: Record<string, string> = {
+      'n-cards': '7777',
+      'visa': '4029',
+      'mastercard': '5067',
+      'mir': '2202'
+    };
     
-    const cvv = Math.floor(100 + Math.random() * 900).toString(); // 3 цифры
+    const selectedBin = bins[cardSystem] || '7777'; // По умолчанию N-cards
+    const randomDigits = Math.random().toString().slice(2, 14).padEnd(12, '0'); // 12 случайных цифр
+    const cardNumber = selectedBin + randomDigits; // Итого 16 цифр
+    
+    const cvv = Math.floor(100 + Math.random() * 900).toString();
     const expiryYear = new Date().getFullYear() + 6;
     const expiryDate = `12/${expiryYear.toString().slice(-2)}`;
 
-    // Создание пользователя со счетом и картой в одной транзакции
     await prisma.user.create({
       data: {
         firstName,
@@ -46,10 +51,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         login,
         password: hashedPassword,
         account: {
-          create: {
-            balance: 0,
-            currency: 'RUB'
-          }
+          create: { balance: 0, currency: 'RUB' }
         },
         cards: {
           create: {
@@ -78,9 +80,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await prisma.user.findUnique({
-      where: { login }
-    });
+    const user = await prisma.user.findUnique({ where: { login } });
 
     if (!user) {
       res.status(401).json({ message: 'Неверный логин или пароль' });
@@ -94,7 +94,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // В токен зашиваем не только ID, но и роль (понадобится для CEO)
     const token = jwt.sign(
       { userId: user.id, role: user.role }, 
       process.env.JWT_SECRET || 'nxt_super_secret', 

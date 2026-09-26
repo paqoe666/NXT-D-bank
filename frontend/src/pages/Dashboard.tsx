@@ -69,15 +69,15 @@ export default function Dashboard() {
     return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
   };
 
-  // --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ПО BIN ---
+  // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', style: 'bg-blue-600 text-white', icon: 'font-black italic' };
-    if (cleanNum.startsWith('4')) return { name: 'VISA', style: 'bg-indigo-600 text-white', icon: 'font-bold italic' };
-    if (cleanNum.startsWith('5')) return { name: 'MASTERCARD', style: 'bg-orange-500 text-white', icon: 'font-bold' };
-    if (cleanNum.startsWith('2')) return { name: 'МИР', style: 'bg-emerald-500 text-white', icon: 'font-bold italic' };
-    if (cleanNum.length > 0) return { name: 'CARD', style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold' };
+    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/logo.png', style: 'bg-blue-600 text-white', icon: '' };
+    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '' };
+    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '' };
+    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '' };
+    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold' };
     return null;
   };
 
@@ -344,9 +344,7 @@ export default function Dashboard() {
   const currentDesign = cardDesigns[activeDesignIndex] || cardDesigns[0];
   const pinCurrentLength = pinStep === 1 ? pinCode.length : pinConfirm.length;
   
-  // Определяем систему текущей карты пользователя
   const myCardSystem = getCardSystem(userData.cards?.[0]?.number || '');
-  // Определяем систему карты для поля перевода
   const transferCardSystem = getCardSystem(transferData.cardOrAccount);
 
   return (
@@ -431,12 +429,14 @@ export default function Dashboard() {
                   <div className="text-right flex flex-col items-end">
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
                     
-                    {/* ДИНАМИЧЕСКИЙ ЛОГОТИП ПЛАТЕЖНОЙ СИСТЕМЫ НА КАРТЕ */}
-                    {myCardSystem ? (
-                      <div className={`text-sm tracking-wider opacity-90 ${myCardSystem.icon}`}>{myCardSystem.name}</div>
+                    {myCardSystem?.logo ? (
+                      <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-8 object-contain drop-shadow-lg" />
+                    ) : myCardSystem ? (
+                      <div className={`text-sm tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
                     ) : (
                       <div className="flex -space-x-3"><div className="w-10 h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-10 h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
                     )}
+
                   </div>
                 </div>
               </motion.div>
@@ -446,7 +446,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* Модалки (управление картой) */}
       <AnimatePresence>
         {isCardModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -463,12 +462,15 @@ export default function Dashboard() {
                     <div className="flex justify-between items-start mb-6 relative z-10"><h3 className="text-xl font-light">{formatMoney(userData.account?.balance)} {userData.account?.currency}</h3><span className="font-bold">NXT</span></div>
                     <div className="flex justify-between items-end relative z-10">
                       <div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div>
-                      {/* ЛОГОТИП В МИНИ-КАРТОЧКЕ */}
-                      {myCardSystem ? (
-                        <div className={`text-xs tracking-wider opacity-90 ${myCardSystem.icon}`}>{myCardSystem.name}</div>
+                      
+                      {myCardSystem?.logo ? (
+                        <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-6 object-contain drop-shadow-lg" />
+                      ) : myCardSystem ? (
+                        <div className={`text-xs tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
                       ) : (
                         <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
                       )}
+
                     </div>
                   </div>
                   <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
@@ -504,7 +506,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Модалка перевода */}
       <AnimatePresence>
         {isTransferModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -560,11 +561,14 @@ export default function Dashboard() {
                           className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-24 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition" 
                           required 
                         />
-                        {/* ЗДЕСЬ ПОЯВЛЯЕТСЯ ЛОГОТИП СИСТЕМЫ ПРИ ВВОДЕ КАРТЫ */}
                         <AnimatePresence>
                           {transferCardSystem && (
-                            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className={`absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg text-[10px] uppercase tracking-widest ${transferCardSystem.style} ${transferCardSystem.icon}`}>
-                              {transferCardSystem.name}
+                            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className={`absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg flex items-center justify-center ${transferCardSystem.style}`}>
+                              {transferCardSystem.logo ? (
+                                <img src={transferCardSystem.logo} alt={transferCardSystem.name} className="h-4 object-contain" />
+                              ) : (
+                                <span className={`text-[10px] uppercase tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
+                              )}
                             </motion.div>
                           )}
                         </AnimatePresence>
