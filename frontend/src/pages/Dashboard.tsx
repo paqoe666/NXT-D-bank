@@ -75,7 +75,7 @@ export default function Dashboard() {
     const cleanNum = cardNumber.replace(/\D/g, '');
     
     // ЗДЕСЬ СИЛЬНО УВЕЛИЧИЛИ N-CARDS (h-12 md:h-16 + scale-150 + origin-right)
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-12 md:h-16 transform scale-150 origin-right' };
+    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-12 md:h-16 transform scale-125 origin-right' };
     
     if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; 
     if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; 
