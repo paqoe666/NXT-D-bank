@@ -69,15 +69,17 @@ export default function Dashboard() {
     return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
   };
 
- // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
-  // --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ С ИНДИВИДУАЛЬНЫМ РАЗМЕРОМ ---
+// --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ С ИНДИВИДУАЛЬНЫМ РАЗМЕРОМ ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-10 md:h-12' }; // N-cards сделали больше
-    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; // Visa сделали меньше
-    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; // Mastercard средний
-    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-6 md:h-7' }; // Мир чуть меньше
+    
+    // ЗДЕСЬ СИЛЬНО УВЕЛИЧИЛИ N-CARDS (h-12 md:h-16 + scale-150 + origin-right)
+    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-12 md:h-16 transform scale-150 origin-right' };
+    
+    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; 
+    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; 
+    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-6 md:h-7' }; 
     if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold', customClass: '' };
     return null;
   };
