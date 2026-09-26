@@ -70,17 +70,18 @@ export default function Dashboard() {
   };
 
 // --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ С ИНДИВИДУАЛЬНЫМ РАЗМЕРОМ ---
+// --- ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
     
-    // ЗДЕСЬ СИЛЬНО УВЕЛИЧИЛИ N-CARDS (h-12 md:h-16 + scale-150 + origin-right)
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '', customClass: 'h-12 md:h-16 transform scale-115 origin-right' };
+    // N-Cards сделали текстом: logo: null. Задаем жирный курсив и красивый синий цвет (text-blue-200)
+    if (cleanNum.startsWith('7777')) return { name: 'N-Cards', logo: null, style: 'bg-blue-600 text-white', icon: 'text-blue-200 drop-shadow-md text-xl md:text-2xl font-black italic', customClass: '' };
     
     if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-5 md:h-6' }; 
     if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-8 md:h-10' }; 
     if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-6 md:h-7' }; 
-    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'font-bold', customClass: '' };
+    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'text-white text-sm md:text-base font-bold', customClass: '' };
     return null;
   };
 
@@ -435,7 +436,7 @@ export default function Dashboard() {
                     {myCardSystem?.logo ? (
   <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} />
 ) : myCardSystem ? (
-  <div className={`text-sm md:text-base tracking-wider font-bold`}>{myCardSystem.name}</div>
+  <div className={`tracking-wider ${myCardSystem.icon}`}>{myCardSystem.name}</div>
 ) : (
   <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
 )}
