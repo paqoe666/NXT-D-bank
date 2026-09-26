@@ -69,11 +69,12 @@ export default function Dashboard() {
     return text.replace(/\b\d{4,}(?:\.\d+)?\b/g, (match) => Number(match).toLocaleString('ru-RU'));
   };
 
-  // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
+ // --- ИСПРАВЛЕННЫЙ ХЕЛПЕР ДЛЯ ОПРЕДЕЛЕНИЯ ПЛАТЕЖНОЙ СИСТЕМЫ ---
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
-    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/logo.png', style: 'bg-blue-600 text-white', icon: '' };
+    // ЗДЕСЬ МЕНЯЕМ /logo.png на /ncards.svg
+    if (cleanNum.startsWith('7777')) return { name: 'N-CARD', logo: '/ncards.svg', style: 'bg-blue-600 text-white', icon: '' };
     if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '' };
     if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '' };
     if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '' };
@@ -430,12 +431,12 @@ export default function Dashboard() {
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
                     
                     {myCardSystem?.logo ? (
-                      <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-8 object-contain drop-shadow-lg" />
-                    ) : myCardSystem ? (
-                      <div className={`text-sm tracking-wider opacity-90 font-bold`}>{myCardSystem.name}</div>
-                    ) : (
-                      <div className="flex -space-x-3"><div className="w-10 h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-10 h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-                    )}
+  <img src={myCardSystem.logo} alt={myCardSystem.name} className="h-5 md:h-6 object-contain opacity-80 mix-blend-overlay drop-shadow-sm" />
+) : myCardSystem ? (
+  <div className={`text-xs md:text-sm tracking-wider opacity-80 font-bold mix-blend-overlay`}>{myCardSystem.name}</div>
+) : (
+  <div className="flex -space-x-3 opacity-80 mix-blend-overlay"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
+)}
 
                   </div>
                 </div>
