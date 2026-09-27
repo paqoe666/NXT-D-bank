@@ -10,7 +10,6 @@ const cardDesigns = [
   { id: 'pink', classes: 'from-pink-600 via-rose-500 to-red-500', name: 'Neon Pink' },
   { id: 'green', classes: 'from-emerald-700 via-emerald-500 to-teal-500', name: 'Forest Green' },
   { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' },
-  
   { id: 'ru', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ru.png', name: 'Россия', currency: 'RUB' },
   { id: 'us', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/us.png', name: 'США', currency: 'USD' },
   { id: 'eu', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/eu.png', name: 'Евросоюз', currency: 'EUR' },
@@ -112,14 +111,12 @@ export default function Dashboard() {
     setPinError('');
     if (pinStep === 1) {
       setPinCode(prev => {
-        if (prev.length >= 4) return prev;
         const newCode = prev + num;
         if (newCode.length === 4) setTimeout(() => setPinStep(2), 300);
         return newCode;
       });
     } else {
       setPinConfirm(prev => {
-        if (prev.length >= 4) return prev;
         const newConfirm = prev + num;
         if (newConfirm.length === 4) {
           if (newConfirm === pinCode) {
@@ -274,10 +271,7 @@ export default function Dashboard() {
     if (newIndex < 0) newIndex = cardDesigns.length - 1;
     if (newIndex >= cardDesigns.length) newIndex = 0;
     setActiveDesignIndex(newIndex);
-    
-    try { 
-      await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); 
-    } catch (e) {}
+    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); } catch (e) {}
   };
 
   const handleCloseCardModal = () => {
@@ -323,8 +317,15 @@ export default function Dashboard() {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ receiverPhone: finalTarget, amount: Number(transferData.amount), comment: transferData.comment }) 
       });
       if (response.ok) {
-        setIsTransferModalOpen(false); setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); setTransferStatus(''); fetchRecentRecipients(); 
-      } else { setTransferStatus('Ошибка'); }
+        setIsTransferModalOpen(false); 
+        setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
+        setTransferStatus(''); 
+        fetchRecentRecipients(); 
+        fetchDashboard(); // <-- МГНОВЕННОЕ ОБНОВЛЕНИЕ БАЛАНСА И КОЛОКОЛЬЧИКА
+      } else { 
+        const err = await response.json();
+        setTransferStatus(err.message || 'Ошибка'); 
+      }
     } catch (error) { setTransferStatus('Ошибка сети'); }
   };
 
@@ -401,7 +402,6 @@ export default function Dashboard() {
               
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}>
                 
-                {/* --- ТЕПЕРЬ ФЛАГИ ВСЕГДА ЦВЕТНЫЕ (убрал mix-blend-luminosity) --- */}
                 {currentDesign.flag ? (
                   <>
                     <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 transition-opacity duration-500" />
@@ -455,7 +455,6 @@ export default function Dashboard() {
                   
                   <div className={`w-full bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
                     
-                    {/* --- ТЕПЕРЬ ФЛАГИ ВСЕГДА ЦВЕТНЫЕ В НАСТРОЙКАХ (убрал mix-blend-luminosity) --- */}
                     {currentDesign.flag ? (
                       <>
                         <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50" />
@@ -571,23 +570,21 @@ export default function Dashboard() {
                         </AnimatePresence>
                       </div>
                     )}
-                    <AnimatePresence>
-                      {recipientName && (
-                        <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 12 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
-                          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 p-3 rounded-xl"><div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">{recipientName.charAt(0)}</div><div><p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{t.recipientFound}</p><p className="text-sm font-bold text-slate-900 dark:text-white">{recipientName}</p></div><CheckCircle2 className="w-5 h-5 text-blue-500 ml-auto" /></div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                   </div>
+                  
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.amount}</label>
-                    <div className="relative"><input type="number" placeholder="0" value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-16 rounded-xl outline-none font-medium text-slate-900 dark:text-white" required /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{userData.account.currency}</span></div>
+                    <div className="relative">
+                      <input type="number" placeholder="0" value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-16 rounded-xl outline-none font-medium text-slate-900 dark:text-white" required />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{userData.account.currency}</span>
+                    </div>
                   </div>
+
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.comment}</label>
                     <div className="relative"><FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" /><input type="text" value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-xl outline-none text-slate-900 dark:text-white" /></div>
                   </div>
-                  <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${userData.account.currency}` : ''}</button>
+                  <button type="submit" className="w-full mt-2 font-bold py-4 rounded-xl transition bg-blue-600 hover:bg-blue-700 text-white">{t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${userData.account.currency}` : ''}</button>
                   {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
                 </form>
               </div>
@@ -665,4 +662,3 @@ export default function Dashboard() {
     </div>
   );
 }
-//фикс
