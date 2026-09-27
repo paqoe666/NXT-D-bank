@@ -321,7 +321,7 @@ export default function Dashboard() {
         setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
         setTransferStatus(''); 
         fetchRecentRecipients(); 
-        fetchDashboard(); // <-- МГНОВЕННОЕ ОБНОВЛЕНИЕ БАЛАНСА И КОЛОКОЛЬЧИКА
+        fetchDashboard(); // ОБНОВЛЯЕМ ДАННЫЕ СРАЗУ ПОСЛЕ ПЕРЕВОДА
       } else { 
         const err = await response.json();
         setTransferStatus(err.message || 'Ошибка'); 
@@ -570,8 +570,17 @@ export default function Dashboard() {
                         </AnimatePresence>
                       </div>
                     )}
+                    
+                    {/* ВОТ ТОТ САМЫЙ БЛОК КОТОРЫЙ Я ЗАБЫЛ */}
+                    <AnimatePresence>
+                      {recipientName && (
+                        <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 12 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
+                          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 p-3 rounded-xl"><div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">{recipientName.charAt(0)}</div><div><p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-0.5">{t.recipientFound}</p><p className="text-sm font-bold text-slate-900 dark:text-white">{recipientName}</p></div><CheckCircle2 className="w-5 h-5 text-blue-500 ml-auto" /></div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                   </div>
-                  
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.amount}</label>
                     <div className="relative">
