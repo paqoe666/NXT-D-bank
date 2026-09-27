@@ -11,7 +11,6 @@ const cardDesigns = [
   { id: 'green', classes: 'from-emerald-700 via-emerald-500 to-teal-500', name: 'Forest Green' },
   { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' },
   
-  // НАСТОЯЩИЕ ФЛАГИ СТРАН И ПРИВЯЗАННЫЕ ВАЛЮТЫ
   { id: 'ru', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ru.png', name: 'Россия', currency: 'RUB' },
   { id: 'us', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/us.png', name: 'США', currency: 'USD' },
   { id: 'eu', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/eu.png', name: 'Евросоюз', currency: 'EUR' },
@@ -281,7 +280,6 @@ export default function Dashboard() {
     } catch (e) {}
   };
 
-  // ФУНКЦИЯ ЗАКРЫТИЯ ОКНА: Показывает смену валюты именно при закрытии
   const handleCloseCardModal = () => {
     setIsCardModalOpen(false);
     const activeDesign = cardDesigns[activeDesignIndex];
@@ -401,12 +399,12 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 flex flex-col gap-6">
               
-              {/* --- ГЛАВНАЯ КАРТОЧКА С ФЛАГАМИ --- */}
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}>
                 
+                {/* --- ТЕПЕРЬ ФЛАГИ ВСЕГДА ЦВЕТНЫЕ (убрал mix-blend-luminosity) --- */}
                 {currentDesign.flag ? (
                   <>
-                    <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-luminosity group-hover:opacity-50 group-hover:mix-blend-normal transition-all duration-500" />
+                    <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 transition-opacity duration-500" />
                     <div className="absolute inset-0 bg-black/50 z-0"></div>
                   </>
                 ) : (
@@ -448,7 +446,6 @@ export default function Dashboard() {
               
               <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><CreditCard className="w-6 h-6 text-blue-500" /> {t.cardManage}</h2>
-                {/* --- ЗДЕСЬ СРАБАТЫВАЕТ ПРОВЕРКА НА ВАЛЮТУ ПРИ ЗАКРЫТИИ --- */}
                 <button onClick={handleCloseCardModal} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
               </div>
 
@@ -456,12 +453,12 @@ export default function Dashboard() {
                 <div className="relative flex items-center justify-center mb-6 group">
                   <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
                   
-                  {/* --- МИНИ-КАРТОЧКА В НАСТРОЙКАХ --- */}
                   <div className={`w-full bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
                     
+                    {/* --- ТЕПЕРЬ ФЛАГИ ВСЕГДА ЦВЕТНЫЕ В НАСТРОЙКАХ (убрал mix-blend-luminosity) --- */}
                     {currentDesign.flag ? (
                       <>
-                        <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 mix-blend-luminosity" />
+                        <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50" />
                         <div className="absolute inset-0 bg-black/50 z-0"></div>
                       </>
                     ) : (
