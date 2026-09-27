@@ -5,37 +5,24 @@ import { LogOut, CreditCard, History, Settings as SettingsIcon, Moon, Sun, Globe
 import { useNavigate } from 'react-router-dom';
 
 const translations = {
-  ru: {
-    dash: 'Главная', hist: 'Операции', set: 'Настройки',
-    title: 'Настройки', pref: 'Предпочтения', theme: 'Оформление', themeDesc: 'Светлая/Тёмная тема',
-    lang: 'Язык', langDesc: 'Основной язык', curr: 'Валюта', currDesc: 'По умолчанию',
-    sound: 'Звук уведомлений', soundDesc: 'Мелодия при переводах',
-    s1: 'Звоночек', s2: 'Мягкий клик', s3: 'Двойной сигнал', off: 'Без звука',
-    sec: 'Безопасность', oldPass: 'Текущий пароль', newPass: 'Новый пароль', confPass: 'Повторите новый пароль',
-    updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно',
-    changePin: 'Сбросить PIN-код', pinCleared: 'Сброшено! Установите новый на Главной.'
-  },
-  en: {
-    dash: 'Dashboard', hist: 'History', set: 'Settings',
-    title: 'Settings', pref: 'Preferences', theme: 'Appearance', themeDesc: 'Light/Dark mode',
-    lang: 'Language', langDesc: 'Main language', curr: 'Currency', currDesc: 'Default currency',
-    sound: 'Notification Sound', soundDesc: 'Transfer alert melody',
-    s1: 'Chime', s2: 'Soft Pop', s3: 'Double Beep', off: 'Muted',
-    sec: 'Security', oldPass: 'Current password', newPass: 'New password', confPass: 'Confirm new password',
-    updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success',
-    changePin: 'Reset PIN code', pinCleared: 'Reset! Set a new one on Dashboard.'
-  },
-  es: {
-    dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes',
-    title: 'Ajustes', pref: 'Preferencias', theme: 'Apariencia', themeDesc: 'Modo claro/oscuro',
-    lang: 'Idioma', langDesc: 'Idioma principal', curr: 'Moneda', currDesc: 'Moneda predeterminada',
-    sound: 'Sonido de notif.', soundDesc: 'Melodía de alerta',
-    s1: 'Campana', s2: 'Clic suave', s3: 'Doble pitido', off: 'Silenciado',
-    sec: 'Seguridad', oldPass: 'Contraseña actual', newPass: 'Nueva contraseña', confPass: 'Confirmar contraseña',
-    updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito',
-    changePin: 'Restablecer PIN', pinCleared: '¡Restablecido! Configura uno nuevo en Inicio.'
-  }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'Настройки', pref: 'Предпочтения', theme: 'Оформление', themeDesc: 'Светлая/Тёмная тема', lang: 'Язык', langDesc: 'Основной язык', curr: 'Валюта', currDesc: 'По умолчанию', sound: 'Звук уведомлений', soundDesc: 'Мелодия при переводах', s1: 'Звоночек', s2: 'Мягкий клик', s3: 'Двойной сигнал', off: 'Без звука', sec: 'Безопасность', oldPass: 'Текущий пароль', newPass: 'Новый пароль', confPass: 'Повторите новый пароль', updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно', changePin: 'Сбросить PIN-код', pinCleared: 'Сброшено! Установите новый на Главной.', cardNumber: 'Номер карты получателя', amount: 'Сумма' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Settings', pref: 'Preferences', theme: 'Appearance', themeDesc: 'Light/Dark mode', lang: 'Language', langDesc: 'Main language', curr: 'Currency', currDesc: 'Default currency', sound: 'Notification Sound', soundDesc: 'Transfer alert melody', s1: 'Chime', s2: 'Soft Pop', s3: 'Double Beep', off: 'Muted', sec: 'Security', oldPass: 'Current password', newPass: 'New password', confPass: 'Confirm new password', updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success', changePin: 'Reset PIN code', pinCleared: 'Reset! Set a new one on Dashboard.', cardNumber: 'Recipient Card Number', amount: 'Amount' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Ajustes', pref: 'Preferencias', theme: 'Apariencia', themeDesc: 'Modo claro/oscuro', lang: 'Idioma', langDesc: 'Idioma principal', curr: 'Moneda', currDesc: 'Moneda predeterminada', sound: 'Sonido de notif.', soundDesc: 'Melodía de alerta', s1: 'Campana', s2: 'Clic suave', s3: 'Doble pitido', off: 'Silenciado', sec: 'Seguridad', oldPass: 'Contraseña actual', newPass: 'Nueva contraseña', confPass: 'Confirmar contraseña', updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito', changePin: 'Restablecer PIN', pinCleared: '¡Restablecido! Configura uno nuevo en Inicio.', cardNumber: 'Número de tarjeta', amount: 'Cantidad' }
 };
+
+const allCurrencies = [
+  { code: 'RUB', label: 'Рубль (₽)' },
+  { code: 'USD', label: 'Доллар ($)' },
+  { code: 'EUR', label: 'Евро (€)' },
+  { code: 'GBP', label: 'Фунт (£)' },
+  { code: 'UAH', label: 'Гривна (₴)' },
+  { code: 'CNY', label: 'Юань (¥)' },
+  { code: 'CHF', label: 'Франк (₣)' },
+  { code: 'JPY', label: 'Иена (¥)' },
+  { code: 'BYN', label: 'Бел. рубль (Br)' },
+  { code: 'AED', label: 'Дирхам (د.إ)' },
+  { code: 'KZT', label: 'Тенге (₸)' }
+];
 
 export default function Settings() {
   const { token, userData, setUserData, logout, theme, setTheme, language, setLanguage, sound, setSound } = useStore();
@@ -45,9 +32,9 @@ export default function Settings() {
   const [currency, setCurrency] = useState('RUB');
   const [passwordForm, setPasswordForm] = useState({ old: '', new: '', confirm: '' });
   const [passStatus, setPassStatus] = useState('');
-  const [pinStatus, setPinStatus] = useState(''); // Стейт для статуса сброса PIN
+  const [pinStatus, setPinStatus] = useState('');
   
-  const [ceoPhone, setCeoPhone] = useState('');
+  const [ceoCard, setCeoCard] = useState('');
   const [ceoAmount, setCeoAmount] = useState('');
   const [ceoStatus, setCeoStatus] = useState('');
 
@@ -118,15 +105,6 @@ export default function Settings() {
     } catch (error) { setPassStatus('Error'); }
   };
 
-  const handleCeoDeposit = async (e: React.FormEvent) => {
-    e.preventDefault(); setCeoStatus('...');
-    try {
-      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ targetPhone: ceoPhone, amount: Number(ceoAmount) }) });
-      if (response.ok) { setCeoStatus(`OK!`); setCeoPhone(''); setCeoAmount(''); setTimeout(() => setCeoStatus(''), 3000); } else setCeoStatus('Error');
-    } catch (error) { setCeoStatus('Error'); }
-  };
-
-  // ФУНКЦИЯ СБРОСА PIN-КОДА
   const handleResetPin = () => {
     if (userData?.account?.userId) {
       localStorage.removeItem(`pin_${userData.account.userId}`);
@@ -135,11 +113,36 @@ export default function Settings() {
     }
   };
 
+  const formatCardDisplay = (val: string) => val.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+  
+  const getCardSystem = (cardNumber: string) => {
+    if (!cardNumber) return null;
+    const cleanNum = cardNumber.replace(/\D/g, '');
+    if (cleanNum.startsWith('7777')) return { name: 'N-Cards', logo: null, style: 'bg-blue-600 text-white', icon: 'text-blue-200 font-black italic drop-shadow-md', customClass: '' };
+    if (cleanNum.startsWith('4029') || cleanNum.startsWith('4')) return { name: 'VISA', logo: '/visa.svg', style: 'bg-indigo-600 text-white', icon: '', customClass: 'h-4' }; 
+    if (cleanNum.startsWith('5067') || cleanNum.startsWith('5')) return { name: 'MASTERCARD', logo: '/mastercard.svg', style: 'bg-orange-500 text-white', icon: '', customClass: 'h-6' }; 
+    if (cleanNum.startsWith('2202') || cleanNum.startsWith('2')) return { name: 'МИР', logo: '/mir.svg', style: 'bg-emerald-500 text-white', icon: '', customClass: 'h-4' }; 
+    if (cleanNum.length > 0) return { name: 'CARD', logo: null, style: 'bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-300', icon: 'text-white font-bold', customClass: '' };
+    return null;
+  };
+
+  const handleCeoDeposit = async (e: React.FormEvent) => {
+    e.preventDefault(); setCeoStatus('...');
+    const rawCardNumber = ceoCard.replace(/\D/g, '');
+    try {
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', { 
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ target: rawCardNumber, amount: Number(ceoAmount) }) 
+      });
+      if (response.ok) { setCeoStatus(`OK!`); setCeoCard(''); setCeoAmount(''); setTimeout(() => setCeoStatus(''), 3000); } 
+      else { const err = await response.json(); setCeoStatus(err.message || 'Ошибка'); }
+    } catch (error) { setCeoStatus('Error'); }
+  };
+
   if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
+  const ceoCardSystem = getCardSystem(ceoCard);
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
-      
       <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
         <div>
           <div className="p-8 hidden md:block"><h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><img src="/logo.png" alt="NXT" className="w-10 h-10 object-contain drop-shadow-md" />NXT-D</h1></div>
@@ -168,11 +171,20 @@ export default function Settings() {
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="md:col-span-2 bg-gradient-to-br from-[#0A192F] via-[#112240] to-blue-900 p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/20 relative overflow-hidden border border-blue-500/20">
                   <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400"><Crown className="w-6 h-6" /> {t.ceo}</h3>
                   <form onSubmit={handleCeoDeposit} className="flex flex-col md:flex-row gap-4 relative z-10">
-                    <input type="text" placeholder="+7..." value={ceoPhone} onChange={(e) => setCeoPhone(e.target.value)} className="flex-1 bg-white/5 border border-blue-400/20 p-4 rounded-xl outline-none text-white focus:bg-white/10" required />
-                    <input type="number" placeholder="10000" value={ceoAmount} onChange={(e) => setCeoAmount(e.target.value)} className="flex-1 bg-white/5 border border-blue-400/20 p-4 rounded-xl outline-none text-white focus:bg-white/10" required />
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-xl transition">Отправить</button>
+                    <div className="relative flex-1">
+                      <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(ceoCard)} onChange={(e) => setCeoCard(e.target.value.replace(/\D/g, ''))} className={`w-full bg-white/5 border border-blue-400/20 py-4 pr-4 rounded-xl outline-none font-medium text-white focus:bg-white/10 transition-all duration-300 ease-out ${ceoCardSystem ? 'pl-[90px]' : 'pl-4'}`} required />
+                      <AnimatePresence>
+                        {ceoCardSystem && (
+                          <motion.div initial={{ opacity: 0, x: -10, y: '-50%' }} animate={{ opacity: 1, x: 0, y: '-50%' }} exit={{ opacity: 0, x: -10, y: '-50%' }} className={`absolute left-3 top-1/2 px-2.5 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${ceoCardSystem.style}`}>
+                            {ceoCardSystem.logo ? <img src={ceoCardSystem.logo} alt={ceoCardSystem.name} className={`${ceoCardSystem.customClass} object-contain`} /> : <span className={`text-[11px] leading-none tracking-widest ${ceoCardSystem.icon}`}>{ceoCardSystem.name}</span>}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <input type="number" placeholder={t.amount} value={ceoAmount} onChange={(e) => setCeoAmount(e.target.value)} className="w-full md:w-48 bg-white/5 border border-blue-400/20 p-4 rounded-xl outline-none text-white focus:bg-white/10" required />
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg shadow-blue-500/30">Отправить</button>
                   </form>
-                  {ceoStatus && <div className="mt-4 text-emerald-400 font-bold">{ceoStatus}</div>}
+                  {ceoStatus && <div className={`mt-4 font-bold ${ceoStatus === 'OK!' ? 'text-emerald-400' : 'text-red-400'}`}>{ceoStatus}</div>}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -181,13 +193,11 @@ export default function Settings() {
               <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none transition-colors duration-300">
                 <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white"><SettingsIcon className="w-5 h-5 text-blue-500" /> {t.pref}</h3>
                 
-                {/* ТЕМА */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-500">{theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}</div><div><p className="font-bold text-sm text-slate-900 dark:text-white">{t.theme}</p><p className="text-xs text-slate-500">{t.themeDesc}</p></div></div>
                   <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="w-14 h-8 bg-slate-200 dark:bg-blue-600 rounded-full relative transition-colors duration-300"><motion.div layout className="w-6 h-6 bg-white rounded-full absolute top-1 shadow-sm" animate={{ left: theme === 'dark' ? '30px' : '4px' }} transition={{ type: "spring", stiffness: 500, damping: 30 }} /></button>
                 </div>
 
-                {/* ЯЗЫК */}
                 <div className="flex items-center justify-between mb-6 relative">
                   <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-500"><Globe className="w-5 h-5" /></div><div><p className="font-bold text-sm text-slate-900 dark:text-white">{t.lang}</p><p className="text-xs text-slate-500">{t.langDesc}</p></div></div>
                   <div className="relative">
@@ -206,33 +216,28 @@ export default function Settings() {
                   </div>
                 </div>
 
-                {/* ВАЛЮТА */}
                 <div className="flex items-center justify-between mb-6 relative">
                   <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-500"><DollarSign className="w-5 h-5" /></div><div><p className="font-bold text-sm text-slate-900 dark:text-white">{t.curr}</p><p className="text-xs text-slate-500">{t.currDesc}</p></div></div>
                   <div className="relative">
                     <button onClick={() => { setIsCurrOpen(!isCurrOpen); setIsLangOpen(false); setIsSoundOpen(false); }} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-slate-900 dark:text-white hover:border-blue-500/50 transition-colors min-w-[120px] justify-between">
-                      {currency === 'RUB' ? 'Рубль (₽)' : currency === 'USD' ? 'Доллар ($)' : 'Евро (€)'} <motion.div animate={{ rotate: isCurrOpen ? 180 : 0 }}><ChevronDown className="w-4 h-4 text-slate-400" /></motion.div>
+                      {allCurrencies.find(c => c.code === currency)?.label || currency} <motion.div animate={{ rotate: isCurrOpen ? 180 : 0 }}><ChevronDown className="w-4 h-4 text-slate-400" /></motion.div>
                     </button>
                     <AnimatePresence>
                       {isCurrOpen && (
-                        <motion.div initial={{ opacity: 0, y: -10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }} className="absolute right-0 top-full mt-2 w-32 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
-                          <button onClick={() => handleCurrencyChange('RUB')} className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Рубль (₽)</button>
-                          <button onClick={() => handleCurrencyChange('USD')} className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Доллар ($)</button>
-                          <button onClick={() => handleCurrencyChange('EUR')} className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Евро (€)</button>
+                        <motion.div initial={{ opacity: 0, y: -10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }} className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto">
+                          {allCurrencies.map(c => (
+                            <button key={c.code} onClick={() => handleCurrencyChange(c.code)} className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                              {c.label}
+                            </button>
+                          ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                 </div>
 
-                {/* ЗВУК */}
                 <div className="flex items-center justify-between relative">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${sound === 'off' ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-slate-50 text-slate-500 dark:bg-slate-900'}`}>
-                      {sound === 'off' ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                    </div>
-                    <div><p className="font-bold text-sm text-slate-900 dark:text-white">{t.sound}</p><p className="text-xs text-slate-500">{t.soundDesc}</p></div>
-                  </div>
+                  <div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${sound === 'off' ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-slate-50 text-slate-500 dark:bg-slate-900'}`}>{sound === 'off' ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</div><div><p className="font-bold text-sm text-slate-900 dark:text-white">{t.sound}</p><p className="text-xs text-slate-500">{t.soundDesc}</p></div></div>
                   <div className="relative">
                     <button onClick={() => { setIsSoundOpen(!isSoundOpen); setIsCurrOpen(false); setIsLangOpen(false); }} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-medium text-slate-900 dark:text-white hover:border-blue-500/50 transition-colors min-w-[120px] justify-between">
                       {sound === 's1' ? t.s1 : sound === 's2' ? t.s2 : sound === 's3' ? t.s3 : t.off} <motion.div animate={{ rotate: isSoundOpen ? 180 : 0 }}><ChevronDown className="w-4 h-4 text-slate-400" /></motion.div>
@@ -267,15 +272,10 @@ export default function Settings() {
                   {passStatus && passStatus !== 'ok' && <div className="p-3 rounded-xl text-xs font-bold text-center bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">{passStatus}</div>}
                 </form>
 
-                {/* НОВАЯ КНОПКА СБРОСА PIN-КОДА */}
                 <button onClick={handleResetPin} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition font-bold text-sm mb-4">
                   <KeyRound className="w-4 h-4" /> {t.changePin}
                 </button>
-                {pinStatus === 'ok' && (
-                  <div className="p-3 mb-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                    <CheckCircle2 className="w-4 h-4"/> {t.pinCleared}
-                  </div>
-                )}
+                {pinStatus === 'ok' && <div className="p-3 mb-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"><CheckCircle2 className="w-4 h-4"/> {t.pinCleared}</div>}
 
                 <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition font-bold text-sm"><LogOut className="w-4 h-4" /> {t.logout}</button>
               </div>
@@ -285,4 +285,4 @@ export default function Settings() {
       </main>
     </div>
   );
-}   
+}

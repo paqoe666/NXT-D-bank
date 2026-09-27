@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Globe } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const cardDesigns = [
@@ -9,7 +9,20 @@ const cardDesigns = [
   { id: 'orange', classes: 'from-orange-600 via-orange-500 to-yellow-500', name: 'Sunset Orange' },
   { id: 'pink', classes: 'from-pink-600 via-rose-500 to-red-500', name: 'Neon Pink' },
   { id: 'green', classes: 'from-emerald-700 via-emerald-500 to-teal-500', name: 'Forest Green' },
-  { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' }
+  { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' },
+  
+  // 11 НОВЫХ ДИЗАЙНОВ ФЛАГОВ С ПРИВЯЗАННЫМИ ВАЛЮТАМИ
+  { id: 'ru', classes: 'from-white via-blue-500 to-red-500', name: 'Россия', currency: 'RUB' },
+  { id: 'us', classes: 'from-blue-700 via-red-500 to-white', name: 'США', currency: 'USD' },
+  { id: 'eu', classes: 'from-blue-600 via-blue-700 to-yellow-500', name: 'Евросоюз', currency: 'EUR' },
+  { id: 'gb', classes: 'from-blue-800 via-red-600 to-white', name: 'Великобритания', currency: 'GBP' },
+  { id: 'ua', classes: 'from-blue-500 via-blue-400 to-yellow-400', name: 'Украина', currency: 'UAH' },
+  { id: 'cn', classes: 'from-red-600 via-red-500 to-yellow-500', name: 'Китай', currency: 'CNY' },
+  { id: 'ch', classes: 'from-red-600 via-red-500 to-white', name: 'Швейцария', currency: 'CHF' },
+  { id: 'jp', classes: 'from-white via-red-100 to-red-500', name: 'Япония', currency: 'JPY' },
+  { id: 'by', classes: 'from-red-600 via-green-600 to-red-800', name: 'Беларусь', currency: 'BYN' },
+  { id: 'ae', classes: 'from-green-600 via-white to-slate-800', name: 'ОАЭ', currency: 'AED' },
+  { id: 'kz', classes: 'from-cyan-500 via-cyan-400 to-yellow-400', name: 'Казахстан', currency: 'KZT' },
 ];
 
 const countries = [
@@ -20,9 +33,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить', currTitle: 'Смена валюты', currDesc: 'Вы выбрали дизайн карты со страной. Хотите изменить вашу основную валюту на', yes: 'Да', no: 'Нет' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change', currTitle: 'Change currency?', currDesc: 'You selected a country card design. Would you like to change your main currency to', yes: 'Yes', no: 'No' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar', currTitle: 'Cambiar moneda?', currDesc: 'Ha seleccionado un diseño de tarjeta de país. ¿Desea cambiar su moneda principal a', yes: 'Sí', no: 'No' }
 };
 
 export default function Dashboard() {
@@ -39,8 +52,9 @@ export default function Dashboard() {
   
   const [activeDesignIndex, setActiveDesignIndex] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
+  
+  const [currencyPrompt, setCurrencyPrompt] = useState<string | null>(null);
 
-  // Стейты для редактирования названия карты
   const [isEditingName, setIsEditingName] = useState(false);
   const [newCardName, setNewCardName] = useState('');
 
@@ -88,9 +102,7 @@ export default function Dashboard() {
     if (!userData?.account?.userId) return;
     const checkPin = () => {
       const savedPin = localStorage.getItem(`pin_${userData.account.userId}`);
-      if (!savedPin && !isPinSetupOpen) {
-        setIsPinSetupOpen(true);
-      }
+      if (!savedPin && !isPinSetupOpen) setIsPinSetupOpen(true);
     };
     const interval = setInterval(checkPin, 15000);
     setTimeout(checkPin, 2000);
@@ -103,9 +115,7 @@ export default function Dashboard() {
       setPinCode(prev => {
         if (prev.length >= 4) return prev;
         const newCode = prev + num;
-        if (newCode.length === 4) {
-          setTimeout(() => setPinStep(2), 300);
-        }
+        if (newCode.length === 4) setTimeout(() => setPinStep(2), 300);
         return newCode;
       });
     } else {
@@ -115,16 +125,8 @@ export default function Dashboard() {
         if (newConfirm.length === 4) {
           if (newConfirm === pinCode) {
             localStorage.setItem(`pin_${userData.account.userId}`, pinCode);
-            setTimeout(() => {
-              setIsPinSetupOpen(false);
-              setPinStep(1);
-              setPinCode('');
-              setPinConfirm('');
-            }, 500);
-          } else {
-            setPinError(t.pinMismatch);
-            return '';
-          }
+            setTimeout(() => { setIsPinSetupOpen(false); setPinStep(1); setPinCode(''); setPinConfirm(''); }, 500);
+          } else { setPinError(t.pinMismatch); return ''; }
         }
         return newConfirm;
       });
@@ -140,16 +142,12 @@ export default function Dashboard() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isPinSetupOpen) return;
-      if (/^[0-9]$/.test(e.key)) {
-        handlePinPress(e.key);
-      } else if (e.key === 'Backspace') {
-        handlePinDelete();
-      }
+      if (/^[0-9]$/.test(e.key)) handlePinPress(e.key);
+      else if (e.key === 'Backspace') handlePinDelete();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPinSetupOpen, pinStep, pinCode]);
-
 
   const handleNotificationClick = (txId?: string) => {
     setIsNotifOpen(false);
@@ -196,7 +194,6 @@ export default function Dashboard() {
       if (response.ok) {
         const history = await response.json();
         const myId = userData.account.userId;
-        
         const outTx = history.filter((tx: any) => tx.senderId === myId && tx.status === 'completed');
         const uniqueRecipients = new Map();
         
@@ -204,19 +201,11 @@ export default function Dashboard() {
           if (!uniqueRecipients.has(tx.target)) {
             let displayName = 'Неизвестный';
             let initial = '?';
-            
-            if (tx.receiver) {
-              displayName = `${tx.receiver.firstName} ${tx.receiver.lastName.charAt(0)}.`;
-              initial = tx.receiver.firstName.charAt(0);
-            } else {
-              displayName = tx.target.slice(-4); 
-              initial = '#';
-            }
-            
+            if (tx.receiver) { displayName = `${tx.receiver.firstName} ${tx.receiver.lastName.charAt(0)}.`; initial = tx.receiver.firstName.charAt(0); } 
+            else { displayName = tx.target.slice(-4); initial = '#'; }
             uniqueRecipients.set(tx.target, { target: tx.target, displayName, initial });
           }
         });
-        
         setRecentRecipients(Array.from(uniqueRecipients.values()).slice(0, 5));
       }
     } catch (error) { console.error(error); }
@@ -240,9 +229,7 @@ export default function Dashboard() {
     if (!loading && location.state?.repeatTx) {
       const { target, amount } = location.state.repeatTx;
       const safeTarget = target || '';
-      
       setIsTransferModalOpen(true);
-
       if (safeTarget.length >= 16 && !safeTarget.includes('+')) {
         setTransferTab('card');
         setTransferData(prev => ({ ...prev, cardOrAccount: safeTarget, amount: String(amount) }));
@@ -259,17 +246,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchRecipient = async () => {
-      const target = transferTab === 'phone' 
-        ? (transferData.rawPhone.length >= selectedCountry.length ? `${selectedCountry.code}${transferData.rawPhone}` : '')
-        : (transferData.cardOrAccount.length >= 16 ? transferData.cardOrAccount : '');
-
+      const target = transferTab === 'phone' ? (transferData.rawPhone.length >= selectedCountry.length ? `${selectedCountry.code}${transferData.rawPhone}` : '') : (transferData.cardOrAccount.length >= 16 ? transferData.cardOrAccount : '');
       if (target && token) {
         try {
           const res = await fetch(`https://nxt-d-bank-backend.onrender.com/api/bank/resolve-recipient?target=${encodeURIComponent(target)}`, { headers: { 'Authorization': `Bearer ${token}` } });
-          if (res.ok) {
-            const data = await res.json();
-            setRecipientName(data.name);
-          }
+          if (res.ok) { const data = await res.json(); setRecipientName(data.name); }
         } catch (e) { setRecipientName(null); }
       } else setRecipientName(null);
     };
@@ -287,18 +268,33 @@ export default function Dashboard() {
     }
   }, [token]);
 
-  const handleLogout = () => { 
-    setIsLogoutModalOpen(false);
-    logout(); 
-    navigate('/login'); 
-  };
+  const handleLogout = () => { setIsLogoutModalOpen(false); logout(); navigate('/login'); };
 
   const changeDesign = async (direction: number) => {
     let newIndex = activeDesignIndex + direction;
     if (newIndex < 0) newIndex = cardDesigns.length - 1;
     if (newIndex >= cardDesigns.length) newIndex = 0;
     setActiveDesignIndex(newIndex);
-    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); } catch (e) {}
+    
+    const newDesign = cardDesigns[newIndex];
+
+    try { 
+      await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); 
+      
+      // ВЫЗЫВАЕМ ПОПАП СМЕНЫ ВАЛЮТЫ, ЕСЛИ ЭТО ФЛАГ
+      if (newDesign.currency && userData?.account?.currency !== newDesign.currency) {
+        setCurrencyPrompt(newDesign.currency);
+      }
+    } catch (e) {}
+  };
+
+  const handleAcceptCurrencyChange = async () => {
+    if (!currencyPrompt) return;
+    try {
+      await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/currency', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ currency: currencyPrompt }) });
+      await fetchDashboard();
+    } catch (error) {}
+    setCurrencyPrompt(null);
   };
 
   const handleMarkAllRead = async () => {
@@ -324,51 +320,29 @@ export default function Dashboard() {
     
     try {
       const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/transfer', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
-        body: JSON.stringify({ receiverPhone: finalTarget, amount: Number(transferData.amount), comment: transferData.comment }) 
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ receiverPhone: finalTarget, amount: Number(transferData.amount), comment: transferData.comment }) 
       });
-      
       if (response.ok) {
-        setIsTransferModalOpen(false); 
-        setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
-        setTransferStatus(''); 
-        fetchRecentRecipients(); 
-      } else {
-        setTransferStatus('Ошибка');
-      }
-    } catch (error) { 
-      setTransferStatus('Ошибка сети'); 
-    }
+        setIsTransferModalOpen(false); setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); setTransferStatus(''); fetchRecentRecipients(); 
+      } else { setTransferStatus('Ошибка'); }
+    } catch (error) { setTransferStatus('Ошибка сети'); }
   };
 
-  // ФУНКЦИЯ ДЛЯ СОХРАНЕНИЯ КАСТОМНОГО НАЗВАНИЯ КАРТЫ
   const handleSaveCardName = async () => {
     setIsEditingName(false);
     if (!newCardName.trim()) return;
-    
     const card = userData.cards?.[0];
     if (!card) return;
-
-    // Мгновенно обновляем UI
     const updatedCards = [...userData.cards];
     updatedCards[0] = { ...card, cardName: newCardName.trim() };
     setUserData({ ...userData, cards: updatedCards });
-
-    try {
-      await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ cardId: card.id, cardName: newCardName.trim() })
-      });
-    } catch (error) { console.error('Ошибка сохранения', error); }
+    try { await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/name', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ cardId: card.id, cardName: newCardName.trim() }) }); } catch (error) {}
   };
 
   if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
   
   const currentDesign = cardDesigns[activeDesignIndex] || cardDesigns[0];
   const pinCurrentLength = pinStep === 1 ? pinCode.length : pinConfirm.length;
-  
   const myCardSystem = getCardSystem(userData.cards?.[0]?.number || '');
   const transferCardSystem = getCardSystem(transferData.cardOrAccount);
 
@@ -377,10 +351,7 @@ export default function Dashboard() {
       <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
         <div>
           <div className="p-8 hidden md:block">
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-              <img src="/logo.png" alt="NXT Logo" className="w-8 h-8 object-contain drop-shadow-md" />
-              NXT-D
-            </h1>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3"><img src="/logo.png" alt="NXT Logo" className="w-8 h-8 object-contain drop-shadow-md" />NXT-D</h1>
           </div>
           <nav className="p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible">
             <button className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-4 py-3 rounded-xl font-medium transition flex items-center gap-3 w-full justify-center md:justify-start"><CreditCard className="w-5 h-5" /> <span className="hidden md:inline">{t.dash}</span></button>
@@ -390,10 +361,7 @@ export default function Dashboard() {
         </div>
         <div className="p-4 hidden md:block">
           <div className="bg-slate-50 dark:bg-[#112240] p-4 rounded-2xl flex items-center justify-between border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div>
-              <div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div>
-            </div>
+            <div className="flex items-center gap-3 overflow-hidden"><div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">{userData.client.charAt(0)}</div><div className="truncate"><p className="text-slate-900 dark:text-white font-medium text-sm truncate">{userData.client.split(' ')[0]}</p></div></div>
             <button onClick={() => setIsLogoutModalOpen(true)} className="text-slate-400 hover:text-red-500 transition p-2"><LogOut className="w-5 h-5" /></button>
           </div>
         </div>
@@ -414,20 +382,14 @@ export default function Dashboard() {
                 {isNotifOpen && (
                   <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50"><h3 className="font-bold text-sm">{t.notif}</h3>{notifications.length > 0 && <button onClick={handleMarkAllRead} className="text-xs text-blue-500 font-medium hover:text-blue-700">{t.readAll}</button>}</div>
-                    
                     <div className="max-h-80 overflow-y-auto">
                       {notifications.length === 0 ? <div className="p-8 text-center text-slate-400 text-sm">{t.noNotif}</div> : notifications.map((notif: any) => (
-                        <div 
-                          key={notif.id} 
-                          onClick={() => handleNotificationClick(notif.transactionId)} 
-                          className="p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition cursor-pointer"
-                        >
+                        <div key={notif.id} onClick={() => handleNotificationClick(notif.transactionId)} className="p-4 border-b border-slate-50 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition cursor-pointer">
                           <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{formatTextNumbers(notif.message)}</p>
                           <p className="text-[10px] text-slate-400 mt-1">{new Date(notif.createdAt || Date.now()).toLocaleString(language === 'ru' ? 'ru-RU' : language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                       ))}
                     </div>
-
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -441,7 +403,6 @@ export default function Dashboard() {
                 <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div>
                 <div className="relative z-10 flex justify-between items-start mb-10">
                   <div>
-                    {/* ТУТ ТЕПЕРЬ ОТОБРАЖАЕТСЯ КАСТОМНОЕ НАЗВАНИЕ КАРТЫ */}
                     <p className="text-white/80 text-sm font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
                     <h3 className="text-4xl md:text-5xl font-light tracking-tight">{formatMoney(userData.account?.balance)} <span className="font-normal opacity-80">{userData.account?.currency}</span></h3>
                   </div>
@@ -454,15 +415,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right flex flex-col items-end">
                     <p className="font-mono mb-2">{userData.cards?.[0]?.expiryDate}</p>
-                    
-                    {myCardSystem?.logo ? (
-                      <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} />
-                    ) : myCardSystem ? (
-                      <div className={`tracking-wider text-xl md:text-2xl ${myCardSystem.icon}`}>{myCardSystem.name}</div>
-                    ) : (
-                      <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-                    )}
-
+                    {myCardSystem?.logo ? <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} object-contain drop-shadow-md`} /> : myCardSystem ? <div className={`tracking-wider text-xl md:text-2xl ${myCardSystem.icon}`}>{myCardSystem.name}</div> : <div className="flex -space-x-3"><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>}
                   </div>
                 </div>
               </motion.div>
@@ -485,8 +438,6 @@ export default function Dashboard() {
                   <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
                   <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
                     <div className="absolute inset-0 bg-white/5"></div>
-                    
-                    {/* ТУТ ТОЖЕ ОТОБРАЖАЕТСЯ КАСТОМНОЕ НАЗВАНИЕ КАРТЫ */}
                     <div className="flex justify-between items-start mb-6 relative z-10">
                       <div>
                         <p className="text-white/80 text-xs font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
@@ -494,49 +445,21 @@ export default function Dashboard() {
                       </div>
                       <span className="font-bold">NXT</span>
                     </div>
-                    
                     <div className="flex justify-between items-end relative z-10">
                       <div><p className="font-mono text-sm tracking-widest">{userData.cards?.[0]?.number.slice(-4).padStart(19, '• ')}</p></div>
-                      
-                      {myCardSystem?.logo ? (
-                        <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} />
-                      ) : myCardSystem ? (
-                        <div className={`tracking-wider text-sm ${myCardSystem.icon} scale-75 transform origin-bottom-right`}>{myCardSystem.name}</div>
-                      ) : (
-                        <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>
-                      )}
-
+                      {myCardSystem?.logo ? <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} /> : myCardSystem ? <div className={`tracking-wider text-sm ${myCardSystem.icon} scale-75 transform origin-bottom-right`}>{myCardSystem.name}</div> : <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>}
                     </div>
                   </div>
                   <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
                 </div>
 
-                {/* --- НОВОЕ ПОЛЕ: РЕДАКТИРОВАНИЕ НАЗВАНИЯ КАРТЫ --- */}
                 <div className="mb-6">
                   <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">{t.cardNameLabel}</h4>
                   <div className="bg-white dark:bg-slate-800 p-2 pl-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
-                    {isEditingName ? (
-                      <input 
-                        type="text" 
-                        value={newCardName}
-                        onChange={(e) => setNewCardName(e.target.value)}
-                        className="bg-transparent outline-none text-slate-900 dark:text-white font-medium w-full"
-                        placeholder={t.acc}
-                        maxLength={20}
-                        autoFocus
-                      />
-                    ) : (
-                      <span className="font-medium text-slate-700 dark:text-slate-200 truncate pr-4">{userData.cards?.[0]?.cardName || t.acc}</span>
-                    )}
-                    
-                    {isEditingName ? (
-                      <button onClick={handleSaveCardName} className="p-2 ml-2 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-xs shrink-0 transition hover:bg-blue-100 dark:hover:bg-blue-500/30">{t.saveBtn}</button>
-                    ) : (
-                      <button onClick={() => { setNewCardName(userData.cards?.[0]?.cardName || t.acc); setIsEditingName(true); }} className="p-2 ml-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition text-xs font-bold uppercase shrink-0">{t.changeBtn}</button>
-                    )}
+                    {isEditingName ? <input type="text" value={newCardName} onChange={(e) => setNewCardName(e.target.value)} className="bg-transparent outline-none text-slate-900 dark:text-white font-medium w-full" placeholder={t.acc} maxLength={20} autoFocus /> : <span className="font-medium text-slate-700 dark:text-slate-200 truncate pr-4">{userData.cards?.[0]?.cardName || t.acc}</span>}
+                    {isEditingName ? <button onClick={handleSaveCardName} className="p-2 ml-2 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-xs shrink-0 transition hover:bg-blue-100 dark:hover:bg-blue-500/30">{t.saveBtn}</button> : <button onClick={() => { setNewCardName(userData.cards?.[0]?.cardName || t.acc); setIsEditingName(true); }} className="p-2 ml-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-500 transition text-xs font-bold uppercase shrink-0">{t.changeBtn}</button>}
                   </div>
                 </div>
-                {/* --- КОНЕЦ ПОЛЯ РЕДАКТИРОВАНИЯ --- */}
                 
                 <div className="grid grid-cols-2 gap-3 mb-8">
                   <div className="relative group cursor-not-allowed">
@@ -577,28 +500,23 @@ export default function Dashboard() {
                 <button onClick={() => setIsTransferModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
               </div>
               <div className="p-6 flex-1 overflow-y-auto">
-                
                 {recentRecipients.length > 0 && (
                   <div className="mb-6">
                     <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">{t.recent}</h4>
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                       {recentRecipients.map((rec, i) => (
                         <button key={i} onClick={() => handleSelectRecent(rec.target)} className="flex flex-col items-center gap-2 shrink-0 group">
-                          <div className="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform">
-                            {rec.initial}
-                          </div>
+                          <div className="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform">{rec.initial}</div>
                           <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{rec.displayName}</span>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
-
                 <div className="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-6">
                   <button onClick={() => setTransferTab('phone')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'phone' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><Smartphone className="w-4 h-4"/> {t.phone}</button>
                   <button onClick={() => setTransferTab('card')} className={`flex-1 py-2 text-sm font-bold rounded-lg transition flex items-center justify-center gap-2 ${transferTab === 'card' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-white' : 'text-slate-500'}`}><CreditCard className="w-4 h-4"/> {t.card}</button>
                 </div>
-                
                 <form onSubmit={handleTransfer}>
                   <div className="mb-4">
                     {transferTab === 'phone' ? (
@@ -615,33 +533,16 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       <div className="relative flex-1">
-                        <input 
-                          type="text" 
-                          placeholder="0000 0000 0000 0000" 
-                          value={formatCardDisplay(transferData.cardOrAccount)} 
-                          onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} 
-                          className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-14 pr-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-out ${transferCardSystem ? 'pl-[90px]' : 'pl-4'}`} 
-                          required 
-                        />
+                        <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(transferData.cardOrAccount)} onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 h-14 pr-4 rounded-xl outline-none font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all duration-300 ease-out ${transferCardSystem ? 'pl-[90px]' : 'pl-4'}`} required />
                         <AnimatePresence>
                           {transferCardSystem && (
-                            <motion.div 
-                              initial={{ opacity: 0, x: -10, y: '-50%' }} 
-                              animate={{ opacity: 1, x: 0, y: '-50%' }} 
-                              exit={{ opacity: 0, x: -10, y: '-50%' }} 
-                              className={`absolute left-3 top-1/2 px-2.5 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${transferCardSystem.style}`}
-                            >
-                              {transferCardSystem.logo ? (
-                                <img src={transferCardSystem.logo} alt={transferCardSystem.name} className="h-4 object-contain" />
-                              ) : (
-                                <span className={`text-[11px] leading-none tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>
-                              )}
+                            <motion.div initial={{ opacity: 0, x: -10, y: '-50%' }} animate={{ opacity: 1, x: 0, y: '-50%' }} exit={{ opacity: 0, x: -10, y: '-50%' }} className={`absolute left-3 top-1/2 px-2.5 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${transferCardSystem.style}`}>
+                              {transferCardSystem.logo ? <img src={transferCardSystem.logo} alt={transferCardSystem.name} className="h-4 object-contain" /> : <span className={`text-[11px] leading-none tracking-widest ${transferCardSystem.icon}`}>{transferCardSystem.name}</span>}
                             </motion.div>
                           )}
                         </AnimatePresence>
                       </div>
                     )}
-                    
                     <AnimatePresence>
                       {recipientName && (
                         <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 12 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
@@ -650,19 +551,15 @@ export default function Dashboard() {
                       )}
                     </AnimatePresence>
                   </div>
-
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.amount}</label>
                     <div className="relative"><input type="number" placeholder="0" value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pr-16 rounded-xl outline-none font-medium text-slate-900 dark:text-white" required /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{userData.account.currency}</span></div>
                   </div>
-
                   <div className="mb-4">
                     <label className="block text-xs font-bold text-slate-400 uppercase mb-2">{t.comment}</label>
                     <div className="relative"><FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" /><input type="text" value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-xl outline-none text-slate-900 dark:text-white" /></div>
                   </div>
-
                   <button type="submit" className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">{t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${userData.account.currency}` : ''}</button>
-
                   {transferStatus && <div className="p-4 mt-4 rounded-xl font-bold text-center bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">{transferStatus}</div>}
                 </form>
               </div>
@@ -671,22 +568,42 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+      {/* НОВЫЙ ПОПАП ДЛЯ СМЕНЫ ВАЛЮТЫ */}
+      <AnimatePresence>
+        {currencyPrompt && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.currTitle}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                {t.currDesc} <span className="font-bold text-slate-900 dark:text-white">{currencyPrompt}</span>?
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setCurrencyPrompt(null)} className="flex-1 py-3 font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition">
+                  {t.no}
+                </button>
+                <button onClick={handleAcceptCurrencyChange} className="flex-1 py-3 font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-xl transition">
+                  {t.yes}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ПОПАП ВЫХОДА */}
       <AnimatePresence>
         {isLogoutModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-center">
-              <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <LogOut className="w-8 h-8" />
-              </div>
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4"><LogOut className="w-8 h-8" /></div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.logoutTitle}</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.logoutDesc}</p>
               <div className="flex gap-3">
-                <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 py-3 font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition">
-                  {t.cancel}
-                </button>
-                <button onClick={handleLogout} className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition">
-                  {t.logoutBtn}
-                </button>
+                <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 py-3 font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition">{t.cancel}</button>
+                <button onClick={handleLogout} className="flex-1 py-3 font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition">{t.logoutBtn}</button>
               </div>
             </motion.div>
           </motion.div>
@@ -697,46 +614,27 @@ export default function Dashboard() {
         {isPinSetupOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
             <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-xs rounded-[2rem] shadow-2xl p-6 relative flex flex-col items-center">
-              
-              <button onClick={() => setIsPinSetupOpen(false)} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition">
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6" />
-              </div>
-              
+              <button onClick={() => setIsPinSetupOpen(false)} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition"><X className="w-5 h-5" /></button>
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4"><Lock className="w-6 h-6" /></div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.pinTitle}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-6 h-10">
-                {pinError ? <span className="text-red-500 font-bold">{pinError}</span> : (pinStep === 1 ? t.pinDesc1 : t.pinDesc2)}
-              </p>
-
+              <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-6 h-10">{pinError ? <span className="text-red-500 font-bold">{pinError}</span> : (pinStep === 1 ? t.pinDesc1 : t.pinDesc2)}</p>
               <div className="flex gap-4 justify-center mb-8">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className={`w-4 h-4 rounded-full transition-colors duration-300 ${i < pinCurrentLength ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
                 ))}
               </div>
-
               <div className="grid grid-cols-3 gap-4 mb-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                  <button key={num} onClick={() => handlePinPress(num.toString())} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">
-                    {num}
-                  </button>
+                  <button key={num} onClick={() => handlePinPress(num.toString())} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">{num}</button>
                 ))}
                 <div />
-                <button onClick={() => handlePinPress('0')} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">
-                  0
-                </button>
-                <button onClick={handlePinDelete} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-red-500 text-2xl font-light hover:bg-red-50 dark:hover:bg-slate-700 transition active:scale-95 flex items-center justify-center">
-                  ⌫
-                </button>
+                <button onClick={() => handlePinPress('0')} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-2xl font-light hover:bg-blue-50 dark:hover:bg-slate-700 transition active:scale-95">0</button>
+                <button onClick={handlePinDelete} className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-red-500 text-2xl font-light hover:bg-red-50 dark:hover:bg-slate-700 transition active:scale-95 flex items-center justify-center">⌫</button>
               </div>
-
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

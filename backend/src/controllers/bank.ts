@@ -56,18 +56,39 @@ export const updateCurrency = async (req: AuthRequest, res: Response): Promise<v
     const oldCurrency = account.currency;
     if (oldCurrency === newCurrency) { res.json({ success: true }); return; }
 
-    let balanceInRub = account.balance;
-    if (oldCurrency === 'USD') balanceInRub = account.balance * 80;
-    if (oldCurrency === 'EUR') balanceInRub = account.balance * 100;
+    // КУРСЫ ВАЛЮТ (относительно Рубля)
+    const rates: Record<string, number> = {
+      'RUB': 1,
+      'USD': 80,
+      'EUR': 100,
+      'GBP': 120, // Британский фунт
+      'UAH': 2.5, // Украинская гривна
+      'CNY': 12,  // Китайский юань
+      'CHF': 110, // Швейцарский франк
+      'JPY': 0.6, // Японская иена
+      'BYN': 30,  // Белорусский рубль
+      'AED': 22,  // Дирхам ОАЭ
+      'KZT': 0.2  // Казахстанский тенге
+    };
 
-    let newBalance = balanceInRub;
-    if (newCurrency === 'USD') newBalance = balanceInRub / 80;
-    if (newCurrency === 'EUR') newBalance = balanceInRub / 100;
+    const rateOld = rates[oldCurrency] || 1;
+    const rateNew = rates[newCurrency] || 1;
+
+    // Сначала переводим старый баланс в рубли, а затем в новую валюту
+    let balanceInRub = account.balance * rateOld;
+    let newBalance = balanceInRub / rateNew;
 
     newBalance = Math.round(newBalance * 100) / 100;
-    await prisma.account.update({ where: { userId }, data: { currency: newCurrency, balance: newBalance } });
+    
+    await prisma.account.update({ 
+      where: { userId }, 
+      data: { currency: newCurrency, balance: newBalance } 
+    });
+    
     res.json({ success: true });
-  } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
+  } catch (error) { 
+    res.status(500).json({ message: 'Ошибка сервера' }); 
+  }
 };
 
 export const updatePassword = async (req: AuthRequest, res: Response): Promise<void> => {
