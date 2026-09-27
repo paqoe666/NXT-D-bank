@@ -11,18 +11,18 @@ const cardDesigns = [
   { id: 'green', classes: 'from-emerald-700 via-emerald-500 to-teal-500', name: 'Forest Green' },
   { id: 'purple', classes: 'from-indigo-800 via-purple-600 to-fuchsia-600', name: 'Deep Purple' },
   
-  // 11 НОВЫХ ДИЗАЙНОВ ФЛАГОВ С ПРИВЯЗАННЫМИ ВАЛЮТАМИ
-  { id: 'ru', classes: 'from-white via-blue-500 to-red-500', name: 'Россия', currency: 'RUB' },
-  { id: 'us', classes: 'from-blue-700 via-red-500 to-white', name: 'США', currency: 'USD' },
-  { id: 'eu', classes: 'from-blue-600 via-blue-700 to-yellow-500', name: 'Евросоюз', currency: 'EUR' },
-  { id: 'gb', classes: 'from-blue-800 via-red-600 to-white', name: 'Великобритания', currency: 'GBP' },
-  { id: 'ua', classes: 'from-blue-500 via-blue-400 to-yellow-400', name: 'Украина', currency: 'UAH' },
-  { id: 'cn', classes: 'from-red-600 via-red-500 to-yellow-500', name: 'Китай', currency: 'CNY' },
-  { id: 'ch', classes: 'from-red-600 via-red-500 to-white', name: 'Швейцария', currency: 'CHF' },
-  { id: 'jp', classes: 'from-white via-red-100 to-red-500', name: 'Япония', currency: 'JPY' },
-  { id: 'by', classes: 'from-red-600 via-green-600 to-red-800', name: 'Беларусь', currency: 'BYN' },
-  { id: 'ae', classes: 'from-green-600 via-white to-slate-800', name: 'ОАЭ', currency: 'AED' },
-  { id: 'kz', classes: 'from-cyan-500 via-cyan-400 to-yellow-400', name: 'Казахстан', currency: 'KZT' },
+  // НАСТОЯЩИЕ ФЛАГИ СТРАН И ПРИВЯЗАННЫЕ ВАЛЮТЫ
+  { id: 'ru', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ru.png', name: 'Россия', currency: 'RUB' },
+  { id: 'us', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/us.png', name: 'США', currency: 'USD' },
+  { id: 'eu', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/eu.png', name: 'Евросоюз', currency: 'EUR' },
+  { id: 'gb', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/gb.png', name: 'Великобритания', currency: 'GBP' },
+  { id: 'ua', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ua.png', name: 'Украина', currency: 'UAH' },
+  { id: 'cn', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/cn.png', name: 'Китай', currency: 'CNY' },
+  { id: 'ch', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ch.png', name: 'Швейцария', currency: 'CHF' },
+  { id: 'jp', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/jp.png', name: 'Япония', currency: 'JPY' },
+  { id: 'by', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/by.png', name: 'Беларусь', currency: 'BYN' },
+  { id: 'ae', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/ae.png', name: 'ОАЭ', currency: 'AED' },
+  { id: 'kz', classes: 'bg-slate-900', flag: 'https://flagcdn.com/w640/kz.png', name: 'Казахстан', currency: 'KZT' },
 ];
 
 const countries = [
@@ -33,9 +33,9 @@ const countries = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить', currTitle: 'Смена валюты', currDesc: 'Вы выбрали дизайн карты со страной. Хотите изменить вашу основную валюту на', yes: 'Да', no: 'Нет' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change', currTitle: 'Change currency?', currDesc: 'You selected a country card design. Would you like to change your main currency to', yes: 'Yes', no: 'No' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar', currTitle: 'Cambiar moneda?', currDesc: 'Ha seleccionado un diseño de tarjeta de país. ¿Desea cambiar su moneda principal a', yes: 'Sí', no: 'No' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По карте', amount: 'Сумма', comment: 'Комментарий', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить', currTitle: 'Смена валюты', currDesc: 'Вы выбрали карту страны. Изменить вашу основную валюту на', yes: 'Да', no: 'Нет' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card', amount: 'Amount', comment: 'Comment', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change', currTitle: 'Change currency?', currDesc: 'You selected a country card. Change your main currency to', yes: 'Yes', no: 'No' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Comentario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar', currTitle: 'Cambiar moneda?', currDesc: 'Ha seleccionado una tarjeta de país. ¿Desea cambiar su moneda a', yes: 'Sí', no: 'No' }
 };
 
 export default function Dashboard() {
@@ -276,16 +276,18 @@ export default function Dashboard() {
     if (newIndex >= cardDesigns.length) newIndex = 0;
     setActiveDesignIndex(newIndex);
     
-    const newDesign = cardDesigns[newIndex];
-
     try { 
       await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/card/design', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ designIndex: newIndex }) }); 
-      
-      // ВЫЗЫВАЕМ ПОПАП СМЕНЫ ВАЛЮТЫ, ЕСЛИ ЭТО ФЛАГ
-      if (newDesign.currency && userData?.account?.currency !== newDesign.currency) {
-        setCurrencyPrompt(newDesign.currency);
-      }
     } catch (e) {}
+  };
+
+  // ФУНКЦИЯ ЗАКРЫТИЯ ОКНА: Показывает смену валюты именно при закрытии
+  const handleCloseCardModal = () => {
+    setIsCardModalOpen(false);
+    const activeDesign = cardDesigns[activeDesignIndex];
+    if (activeDesign.currency && userData?.account?.currency !== activeDesign.currency) {
+      setTimeout(() => setCurrencyPrompt(activeDesign.currency), 300);
+    }
   };
 
   const handleAcceptCurrencyChange = async () => {
@@ -398,9 +400,22 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}>
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none"></div>
-                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none"></div>
+              
+              {/* --- ГЛАВНАЯ КАРТОЧКА С ФЛАГАМИ --- */}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setIsCardModalOpen(true)} className={`relative overflow-hidden bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-8 rounded-[2rem] text-white shadow-2xl shadow-blue-900/10 cursor-pointer group transform-gpu`}>
+                
+                {currentDesign.flag ? (
+                  <>
+                    <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-luminosity group-hover:opacity-50 group-hover:mix-blend-normal transition-all duration-500" />
+                    <div className="absolute inset-0 bg-black/50 z-0"></div>
+                  </>
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none z-0"></div>
+                    <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none z-0"></div>
+                  </>
+                )}
+
                 <div className="relative z-10 flex justify-between items-start mb-10">
                   <div>
                     <p className="text-white/80 text-sm font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
@@ -420,6 +435,7 @@ export default function Dashboard() {
                 </div>
               </motion.div>
             </div>
+            
             <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p><button onClick={() => setIsTransferModalOpen(true)} className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20">{t.newTrans}</button></div></div>
           </div>
         </div>
@@ -429,15 +445,29 @@ export default function Dashboard() {
         {isCardModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh]">
+              
               <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><CreditCard className="w-6 h-6 text-blue-500" /> {t.cardManage}</h2>
-                <button onClick={() => setIsCardModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
+                {/* --- ЗДЕСЬ СРАБАТЫВАЕТ ПРОВЕРКА НА ВАЛЮТУ ПРИ ЗАКРЫТИИ --- */}
+                <button onClick={handleCloseCardModal} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition text-slate-500 dark:text-slate-400"><X className="w-5 h-5" /></button>
               </div>
+
               <div className="p-6 bg-slate-50 dark:bg-slate-900/50 flex-1 overflow-y-auto">
                 <div className="relative flex items-center justify-center mb-6 group">
                   <button onClick={() => changeDesign(-1)} className="absolute left-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronLeft className="w-5 h-5" /></button>
-                  <div className={`w-full bg-gradient-to-br ${currentDesign.classes} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
-                    <div className="absolute inset-0 bg-white/5"></div>
+                  
+                  {/* --- МИНИ-КАРТОЧКА В НАСТРОЙКАХ --- */}
+                  <div className={`w-full bg-gradient-to-br ${currentDesign.classes || 'bg-slate-900'} p-6 rounded-2xl text-white shadow-lg shadow-blue-900/10 relative overflow-hidden transition-all duration-500`}>
+                    
+                    {currentDesign.flag ? (
+                      <>
+                        <img src={currentDesign.flag} alt="flag" className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 mix-blend-luminosity" />
+                        <div className="absolute inset-0 bg-black/50 z-0"></div>
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-white/5 z-0"></div>
+                    )}
+
                     <div className="flex justify-between items-start mb-6 relative z-10">
                       <div>
                         <p className="text-white/80 text-xs font-medium mb-1">{userData.cards?.[0]?.cardName || t.acc}</p>
@@ -450,6 +480,7 @@ export default function Dashboard() {
                       {myCardSystem?.logo ? <img src={myCardSystem.logo} alt={myCardSystem.name} className={`${myCardSystem.customClass} scale-75 transform origin-bottom-right object-contain drop-shadow-md`} /> : myCardSystem ? <div className={`tracking-wider text-sm ${myCardSystem.icon} scale-75 transform origin-bottom-right`}>{myCardSystem.name}</div> : <div className="flex -space-x-2"><div className="w-6 h-6 rounded-full bg-red-500/90 mix-blend-multiply"></div><div className="w-6 h-6 rounded-full bg-yellow-400/90 mix-blend-multiply"></div></div>}
                     </div>
                   </div>
+
                   <button onClick={() => changeDesign(1)} className="absolute right-[-10px] z-20 p-2 bg-white dark:bg-slate-800 rounded-full shadow-md text-slate-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition"><ChevronRight className="w-5 h-5" /></button>
                 </div>
 
@@ -568,7 +599,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* НОВЫЙ ПОПАП ДЛЯ СМЕНЫ ВАЛЮТЫ */}
       <AnimatePresence>
         {currencyPrompt && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
@@ -593,7 +623,6 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* ПОПАП ВЫХОДА */}
       <AnimatePresence>
         {isLogoutModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -635,6 +664,7 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
