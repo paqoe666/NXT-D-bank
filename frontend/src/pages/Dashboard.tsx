@@ -33,10 +33,10 @@ const countries = [
 ];
 
 const BANKS = [
-  { id: 'nxt', name: 'NXT D-Bank', bg: 'bg-blue-600', text: 'text-white', border: 'border-blue-500', icon: 'N' },
-  { id: 'tbank', name: 'Т-Банк', bg: 'bg-yellow-400', text: 'text-black', border: 'border-yellow-400', icon: 'T' },
-  { id: 'sber', name: 'Сбербанк', bg: 'bg-green-600', text: 'text-white', border: 'border-green-600', icon: 'С' },
-  { id: 'alfa', name: 'Альфа-Банк', bg: 'bg-red-600', text: 'text-white', border: 'border-red-600', icon: 'А' },
+  { id: 'nxt', name: 'NXT D-Bank', bg: 'bg-blue-600', text: 'text-white', border: 'border-blue-500', logo: <span className="font-black italic text-xl">N</span> },
+  { id: 'tbank', name: 'Т-Банк', bg: 'bg-yellow-400', text: 'text-black', border: 'border-yellow-400', logo: <span className="font-bold text-xl">T</span> },
+  { id: 'sber', name: 'Сбербанк', bg: 'bg-[#21A038]', text: 'text-white', border: 'border-[#21A038]', logo: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 12l3 3 5-5"/></svg> },
+  { id: 'alfa', name: 'Альфа-Банк', bg: 'bg-[#EF3124]', text: 'text-white', border: 'border-[#EF3124]', logo: <span className="font-black text-xl tracking-tighter border-b-[3px] border-white pb-0.5 leading-none mt-1">A</span> },
 ];
 
 const translations = {
@@ -586,7 +586,7 @@ export default function Dashboard() {
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p>
                 <button 
                   onClick={() => { setIsTransferModalOpen(true); setTransferStep('select'); }}
-                  className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20"
+                  className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition"
                 >
                   {t.newTrans}
                 </button>
@@ -679,12 +679,12 @@ export default function Dashboard() {
       <AnimatePresence>
         {isTransferModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-[#1C1C1E] w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden relative">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-[#1C1C1E] w-full max-w-md rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden relative border border-white/10">
               
               {(transferStep !== 'processing' && transferStep !== 'success_phone' && transferStep !== 'success_card') && (
-                <div className="p-5 flex items-center justify-between shrink-0 relative">
+                <div className="p-5 flex items-center justify-between shrink-0 relative border-b border-white/5">
                   {transferStep !== 'select' ? (
-                    <button onClick={() => setTransferStep('select')} className="p-2 -ml-2 text-blue-500 font-medium flex items-center gap-1 z-10"><ChevronLeft className="w-5 h-5" /> Назад</button>
+                    <button onClick={() => setTransferStep('select')} className="p-2 -ml-2 text-blue-500 font-medium flex items-center gap-1 z-10 transition hover:opacity-80"><ChevronLeft className="w-5 h-5" /> Назад</button>
                   ) : (
                     <div className="w-10"></div>
                   )}
@@ -713,13 +713,13 @@ export default function Dashboard() {
 
               {/* ШАГ 2 */}
               {transferStep === 'phone_input' && (
-                <div className="p-6 flex-1 overflow-y-auto">
+                <div className="p-6 flex-1 overflow-y-auto scrollbar-hide">
                   <div className="flex relative bg-[#2C2C2E] rounded-2xl mb-6">
                     <div className="relative">
-                      <button type="button" onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)} className="flex items-center gap-2 h-full px-4 border-r border-[#3C3C3E]"><span className="text-xl">{selectedCountry.flag}</span><span className="font-medium text-white">{selectedCountry.code}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                      <button type="button" onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)} className="flex items-center gap-2 h-full px-4 border-r border-[#3C3C3E] transition hover:opacity-80"><span className="text-xl">{selectedCountry.flag}</span><span className="font-medium text-white">{selectedCountry.code}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                       {isCountryDropdownOpen && (
                         <div className="absolute top-full left-0 mt-2 w-56 bg-[#2C2C2E] rounded-xl shadow-xl z-50 overflow-hidden border border-[#3C3C3E]">
-                          {countries.map(c => <button key={c.code} type="button" onClick={() => { setSelectedCountry(c); setIsCountryDropdownOpen(false); setTransferData({...transferData, rawPhone: ''}); }} className="w-full flex items-center gap-3 p-3 hover:bg-[#3C3C3E] text-left"><span className="text-xl">{c.flag}</span><div><p className="font-bold text-sm text-white">{c.code}</p><p className="text-xs text-slate-400">{c.name}</p></div></button>)}
+                          {countries.map(c => <button key={c.code} type="button" onClick={() => { setSelectedCountry(c); setIsCountryDropdownOpen(false); setTransferData({...transferData, rawPhone: ''}); }} className="w-full flex items-center gap-3 p-3 hover:bg-[#3C3C3E] text-left transition"><span className="text-xl">{c.flag}</span><div><p className="font-bold text-sm text-white">{c.code}</p><p className="text-xs text-slate-400">{c.name}</p></div></button>)}
                         </div>
                       )}
                     </div>
@@ -729,7 +729,7 @@ export default function Dashboard() {
                   <button 
                     disabled={transferData.rawPhone.length < selectedCountry.length} 
                     onClick={() => { setTransferStep('phone_details'); }} 
-                    className="w-full bg-blue-600 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-white font-semibold py-4 rounded-xl transition mb-8"
+                    className="w-full bg-blue-600 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-white font-semibold py-4 rounded-xl transition hover:bg-blue-700 mb-8"
                   >
                     {t.continue}
                   </button>
@@ -740,7 +740,7 @@ export default function Dashboard() {
                       <div className="flex flex-col gap-2">
                         {recentRecipients.map((rec, i) => (
                           <button key={i} onClick={() => handleSelectRecent(rec.target)} className="flex items-center gap-4 p-3 bg-[#2C2C2E] hover:bg-[#3C3C3E] rounded-2xl transition text-left">
-                            <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg font-bold">{rec.initial}</div>
+                            <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center text-lg font-bold">{rec.initial}</div>
                             <div>
                               <span className="block font-medium text-white">{rec.displayName}</span>
                               <span className="block text-xs text-slate-400">{rec.target}</span>
@@ -755,15 +755,12 @@ export default function Dashboard() {
 
               {/* ШАГ 3 */}
               {transferStep === 'phone_details' && (
-                <div className="p-4 flex-1 overflow-y-auto">
+                <div className="p-4 flex-1 overflow-y-auto scrollbar-hide">
                   <form onSubmit={handleTransfer}>
                     
-                    <div className="bg-gradient-to-br from-[#2C2C2E] to-[#1C1C1E] border border-white/5 rounded-3xl p-5 mb-6 shadow-lg">
+                    <div className="bg-[#2C2C2E] border border-white/5 rounded-3xl p-5 mb-6 shadow-lg">
                       <p className="text-sm text-slate-400 font-medium mb-1">{userData?.cards?.[0]?.cardName || 'Счет'}</p>
-                      <h3 className="text-3xl font-bold text-white tracking-tight">{formatMoney(safeBalance)} {safeCurrency}</h3>
-                      <div className="flex gap-1 mt-2 opacity-50">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>
-                      </div>
+                      <h3 className="text-3xl font-bold text-white tracking-tight">{formatMoney(safeBalance)} <span className="text-slate-500">{safeCurrency}</span></h3>
                     </div>
 
                     <div className="mb-6 px-2">
@@ -771,11 +768,12 @@ export default function Dashboard() {
                       <p className="text-slate-400 font-mono text-sm">{selectedCountry.code} {formatPhoneDisplay(transferData.rawPhone)}</p>
                     </div>
 
-                    <div className="flex gap-3 overflow-x-auto pb-4 mb-2 scrollbar-hide px-2">
+                    {/* Банки - горизонтальный скролл */}
+                    <div className="flex gap-3 overflow-x-auto pb-4 mb-2 px-2 snap-x" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                       {BANKS.map(bank => (
-                        <div key={bank.id} onClick={() => setSelectedBank(bank)} className={`w-[104px] h-[104px] rounded-[1.25rem] flex flex-col p-3 cursor-pointer shrink-0 border-2 transition-all ${selectedBank.id === bank.id ? bank.border : 'border-transparent bg-[#2C2C2E] hover:bg-[#3C3C3E]'}`}>
+                        <div key={bank.id} onClick={() => setSelectedBank(bank)} className={`w-[104px] h-[104px] rounded-[1.25rem] flex flex-col p-3 cursor-pointer shrink-0 border-2 transition-all snap-start ${selectedBank.id === bank.id ? bank.border : 'border-transparent bg-[#2C2C2E] hover:bg-[#3C3C3E]'}`}>
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-auto ${selectedBank.id === bank.id || bank.id === 'nxt' ? bank.bg : 'bg-[#1C1C1E]'} ${selectedBank.id === bank.id || bank.id === 'nxt' ? bank.text : 'text-slate-400'}`}>
-                            {bank.icon}
+                            {bank.logo}
                           </div>
                           <div>
                             <p className="text-[11px] font-medium text-white leading-tight">{bank.name}</p>
@@ -787,15 +785,15 @@ export default function Dashboard() {
 
                     <div className="mb-4">
                       <div className="relative">
-                        <input type="number" placeholder={`Сумма от 0,01 ${safeCurrency}`} value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none font-medium text-white" required />
+                        <input type="number" placeholder={`Сумма от 0,01 ${safeCurrency}`} value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none font-medium text-white transition focus:ring-1 focus:ring-white/20" required />
                       </div>
                     </div>
 
                     <div className="mb-8">
-                      <input type="text" placeholder={t.comment} value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none text-white" />
+                      <input type="text" placeholder={t.comment} value={transferData.comment} onChange={(e) => setTransferData({...transferData, comment: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none text-white transition focus:ring-1 focus:ring-white/20" />
                     </div>
 
-                    <button type="submit" disabled={!transferData.amount} className="w-full bg-yellow-400 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-black font-semibold py-4 rounded-2xl text-lg transition">
+                    <button type="submit" disabled={!transferData.amount} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-white font-semibold py-4 rounded-2xl text-lg transition shadow-lg shadow-blue-900/20">
                       {t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${safeCurrency}` : ''}
                     </button>
                     {transferStatus && <p className="text-red-500 text-center mt-4 font-medium">{transferStatus}</p>}
@@ -805,15 +803,15 @@ export default function Dashboard() {
 
               {/* ШАГ 4 */}
               {transferStep === 'card_details' && (
-                <div className="p-4 flex-1 overflow-y-auto">
+                <div className="p-4 flex-1 overflow-y-auto scrollbar-hide">
                   <form onSubmit={handleTransfer}>
-                    <div className="bg-gradient-to-br from-[#2C2C2E] to-[#1C1C1E] border border-white/5 rounded-3xl p-5 mb-8 shadow-lg">
+                    <div className="bg-[#2C2C2E] border border-white/5 rounded-3xl p-5 mb-8 shadow-lg">
                       <p className="text-sm text-slate-400 font-medium mb-1">{userData?.cards?.[0]?.cardName || 'Счет'}</p>
-                      <h3 className="text-3xl font-bold text-white tracking-tight">{formatMoney(safeBalance)} {safeCurrency}</h3>
+                      <h3 className="text-3xl font-bold text-white tracking-tight">{formatMoney(safeBalance)} <span className="text-slate-500">{safeCurrency}</span></h3>
                     </div>
 
                     <div className="mb-4 relative">
-                      <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(transferData.cardOrAccount)} onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} className={`w-full bg-[#2C2C2E] h-14 pr-4 rounded-2xl outline-none font-medium text-white transition-all duration-300 ${transferCardSystem ? 'pl-[70px]' : 'pl-4'}`} required />
+                      <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(transferData.cardOrAccount)} onChange={(e) => setTransferData({...transferData, cardOrAccount: e.target.value.replace(/\D/g, '')})} className={`w-full bg-[#2C2C2E] h-14 pr-4 rounded-2xl outline-none font-medium text-white transition-all duration-300 focus:ring-1 focus:ring-white/20 ${transferCardSystem ? 'pl-[70px]' : 'pl-4'}`} required />
                       <AnimatePresence>
                         {transferCardSystem && (
                           <motion.div initial={{ opacity: 0, x: -10, y: '-50%' }} animate={{ opacity: 1, x: 0, y: '-50%' }} exit={{ opacity: 0, x: -10, y: '-50%' }} className={`absolute left-3 top-1/2 px-2 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${transferCardSystem.style}`}>
@@ -828,10 +826,10 @@ export default function Dashboard() {
                     )}
 
                     <div className="mb-8">
-                      <input type="number" placeholder={`Сумма в ${safeCurrency}`} value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none font-medium text-white" required />
+                      <input type="number" placeholder={`Сумма в ${safeCurrency}`} value={transferData.amount} onChange={(e) => setTransferData({...transferData, amount: e.target.value})} className="w-full bg-[#2C2C2E] p-4 rounded-2xl outline-none font-medium text-white transition focus:ring-1 focus:ring-white/20" required />
                     </div>
 
-                    <button type="submit" disabled={!transferData.amount || transferData.cardOrAccount.length < 16} className="w-full bg-yellow-400 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-black font-semibold py-4 rounded-2xl text-lg transition">
+                    <button type="submit" disabled={!transferData.amount || transferData.cardOrAccount.length < 16} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-[#2C2C2E] disabled:text-slate-500 text-white font-semibold py-4 rounded-2xl text-lg transition shadow-lg shadow-blue-900/20">
                       {t.send} {transferData.amount ? `${formatMoney(transferData.amount)} ${safeCurrency}` : ''}
                     </button>
                     {transferStatus && <p className="text-red-500 text-center mt-4 font-medium">{transferStatus}</p>}
@@ -839,10 +837,10 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* ШАГ 5 */}
+              {/* ШАГ 5 (Анимация) */}
               {transferStep === 'processing' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center p-10 min-h-[400px]">
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, 0] }} transition={{ type: 'spring', stiffness: 200, damping: 15 }} className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.4)]">
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, 0] }} transition={{ type: 'spring', stiffness: 200, damping: 15 }} className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.4)]">
                     <CheckCircle2 className="w-14 h-14 text-white" />
                   </motion.div>
                   <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-2xl font-bold text-white mt-6">
@@ -851,74 +849,74 @@ export default function Dashboard() {
                 </motion.div>
               )}
 
-              {/* ШАГ 6 */}
+              {/* ШАГ 6 (Успех Телефон - NXT Стиль) */}
               {transferStep === 'success_phone' && (
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full bg-[#1C1C1E] min-h-[500px]">
-                  <div className="p-5 flex justify-between">
-                    <button onClick={handleCloseTransferModal} className="text-blue-500 font-medium">{t.close}</button>
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full bg-[#1C1C1E] min-h-[500px] overflow-hidden">
+                  <div className="p-5 flex justify-between shrink-0">
+                    <button onClick={handleCloseTransferModal} className="text-blue-500 font-medium hover:text-blue-400 transition">{t.close}</button>
                   </div>
-                  <div className="flex-1 flex flex-col items-center px-6 pt-4 pb-8">
-                    <div className={`w-20 h-20 rounded-full flex items-center justify-center font-bold text-3xl mb-4 relative ${selectedBank.bg} ${selectedBank.text}`}>
-                      {selectedBank.icon}
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-2 border-[#1C1C1E] rounded-full flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-white"/></div>
+                  <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 pt-4 pb-8 scrollbar-hide">
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl mb-4 relative ${selectedBank.bg} ${selectedBank.text}`}>
+                      {selectedBank.logo}
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 border-2 border-[#1C1C1E] rounded-full flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-white"/></div>
                     </div>
                     <h3 className="text-xl font-medium text-white mb-1">{recipientName || 'Неизвестный'}</h3>
                     <p className="text-slate-400 font-mono mb-6">{selectedCountry.code} {formatPhoneDisplay(transferData.rawPhone)}</p>
-                    <h2 className="text-4xl font-bold text-white tracking-tight mb-8">-{formatMoney(transferData.amount)} {safeCurrency}</h2>
+                    <h2 className="text-4xl font-bold text-white tracking-tight mb-8">-{formatMoney(transferData.amount)} <span className="text-slate-400">{safeCurrency}</span></h2>
                     
                     <button onClick={handleDownloadReceipt} className="flex flex-col items-center gap-2 p-3 bg-[#2C2C2E] hover:bg-[#3C3C3E] rounded-2xl w-24 transition mb-auto">
                       <FileText className="w-6 h-6 text-blue-500" />
                       <span className="text-xs font-medium text-blue-500">{t.receipt}</span>
                     </button>
 
-                    <div className="w-full bg-[#2C2C2E] rounded-3xl p-4 mt-8">
-                      <p className="text-slate-400 text-sm mb-1">Перевод со счета</p>
+                    <div className="w-full bg-[#2C2C2E] border border-white/5 rounded-3xl p-4 mt-8">
+                      <p className="text-slate-400 text-sm mb-2">Перевод со счета</p>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">{safeCurrency.charAt(0)}</div>
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center text-xs font-bold">{safeCurrency.charAt(0)}</div>
                         <div className="flex-1">
                           <p className="text-white font-medium">{userData?.cards?.[0]?.cardName || 'Счет'}</p>
-                          <p className="text-slate-400 text-xs">{formatMoney(Number(safeBalance) + Number(transferData.amount))} → {formatMoney(safeBalance)}</p>
+                          <p className="text-slate-400 text-xs font-mono">{formatMoney(Number(safeBalance) + Number(transferData.amount))} → {formatMoney(safeBalance)}</p>
                         </div>
                       </div>
                     </div>
 
-                    <button onClick={handleCloseTransferModal} className="w-full bg-yellow-400 text-black font-semibold py-4 rounded-2xl text-lg mt-4 transition hover:bg-yellow-500">
+                    <button onClick={handleCloseTransferModal} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-2xl text-lg mt-4 transition shadow-lg shadow-blue-900/20">
                       {t.done}
                     </button>
                   </div>
                 </motion.div>
               )}
 
-              {/* ШАГ 7 */}
+              {/* ШАГ 7 (Успех Карта - NXT Стиль) */}
               {transferStep === 'success_card' && (
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full bg-[#1C1C1E] min-h-[500px]">
-                  <div className="p-5 flex justify-center border-b border-white/5">
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full bg-[#1C1C1E] min-h-[500px] overflow-hidden">
+                  <div className="p-5 flex justify-center border-b border-white/5 shrink-0">
                     <span className="font-semibold text-white">Перевод</span>
                   </div>
-                  <div className="flex-1 flex flex-col items-center px-6 pt-10 pb-8">
-                    <p className="text-slate-400 mb-2">со счета {userData?.cards?.[0]?.cardName || 'cash'}</p>
-                    <p className="text-slate-500 text-sm mb-6 line-through decoration-slate-500">{formatMoney(Number(safeBalance) + Number(transferData.amount))} {safeCurrency}</p>
+                  <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 pt-10 pb-8 scrollbar-hide">
+                    <p className="text-slate-400 mb-2">со счета <span className="text-white font-medium">{userData?.cards?.[0]?.cardName || 'cash'}</span></p>
+                    <p className="text-slate-500 text-sm font-mono mb-6 line-through decoration-slate-500">{formatMoney(Number(safeBalance) + Number(transferData.amount))} {safeCurrency}</p>
                     
-                    <h2 className="text-5xl font-bold text-white tracking-tight mb-12">-{formatMoney(transferData.amount)} {safeCurrency}</h2>
+                    <h2 className="text-5xl font-bold text-white tracking-tight mb-12">-{formatMoney(transferData.amount)} <span className="text-slate-400">{safeCurrency}</span></h2>
                     
-                    <div className="w-full bg-white rounded-[2rem] overflow-hidden shadow-xl mb-auto relative">
-                      <div className="h-20 bg-yellow-400 w-full relative flex justify-center">
-                         <span className="text-black font-medium mt-4">{recipientName || 'Неизвестный'}</span>
-                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-white rounded-full flex items-center justify-center p-1.5 shadow-sm">
-                           <div className="w-full h-full bg-yellow-400 rounded-full flex items-center justify-center font-bold text-black text-xl">T</div>
+                    <div className="w-full bg-gradient-to-br from-[#2C2C2E] to-[#1C1C1E] rounded-[2rem] overflow-hidden shadow-xl border border-white/5 mb-auto relative">
+                      <div className="h-20 bg-blue-600 w-full relative flex justify-center">
+                         <span className="text-white font-medium mt-4">{recipientName || 'Неизвестный'}</span>
+                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#1C1C1E] rounded-full flex items-center justify-center p-1.5 shadow-sm">
+                           <div className="w-full h-full bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center font-black italic text-xl">N</div>
                          </div>
                       </div>
-                      <div className="pt-12 pb-6 text-center bg-white">
+                      <div className="pt-12 pb-6 text-center">
                          <p className="text-slate-400 text-sm">Карта получателя</p>
-                         <p className="text-slate-900 font-mono font-bold text-lg mt-1">220070******{transferData.cardOrAccount.slice(-4)}</p>
+                         <p className="text-white font-mono font-bold text-lg mt-1">220070******{transferData.cardOrAccount.slice(-4)}</p>
                       </div>
                     </div>
 
                     <div className="w-full flex justify-center mt-6 mb-4">
-                      <button onClick={handleDownloadReceipt} className="text-blue-500 flex items-center gap-2 font-medium hover:text-blue-400"><Download className="w-5 h-5"/> Скачать квитанцию</button>
+                      <button onClick={handleDownloadReceipt} className="text-blue-500 flex items-center gap-2 font-medium hover:text-blue-400 transition"><Download className="w-5 h-5"/> Скачать квитанцию</button>
                     </div>
 
-                    <button onClick={handleCloseTransferModal} className="w-full bg-yellow-400 text-black font-semibold py-4 rounded-2xl text-lg mt-4 transition hover:bg-yellow-500">
+                    <button onClick={handleCloseTransferModal} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-2xl text-lg mt-4 transition shadow-lg shadow-blue-900/20">
                       {t.done}
                     </button>
                   </div>
