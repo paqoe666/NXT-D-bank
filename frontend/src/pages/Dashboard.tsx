@@ -37,7 +37,7 @@ const translations = {
 };
 
 export default function Dashboard() {
-  const { token, userData, setUserData, logout, language } = useStore();
+  const { token, userData, setUserData, logout, language, sound } = useStore();
   const navigate = useNavigate();
   const location = useLocation(); 
   const [loading, setLoading] = useState(true);
@@ -72,28 +72,46 @@ export default function Dashboard() {
   const [pinConfirm, setPinConfirm] = useState('');
   const [pinError, setPinError] = useState('');
 
-  // Рефы для логики пушей
+  // Кастомные In-App уведомления
+  const [inAppNotif, setInAppNotif] = useState<{title: string, message: string} | null>(null);
+
   const isFirstLoadRef = useRef(true);
   const latestNotifIdRef = useRef<string | null>(null);
   
   const t = translations[language as keyof typeof translations] || translations.ru;
 
-  // --- ФУНКЦИИ ДЛЯ PUSH-УВЕДОМЛЕНИЙ ---
-  const requestPushPermission = () => {
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
+  // --- ФУНКЦИЯ ДЛЯ ЗВУКА И IN-APP УВЕДОМЛЕНИЙ ---
+  const playSound = (type: string) => {
+    if (!type || type === 'off') return;
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+
+      if (type === 's1') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start(); osc.stop(ctx.currentTime + 0.5);
+      } else if (type === 's2') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(400, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.start(); osc.stop(ctx.currentTime + 0.1);
+      } else if (type === 's3') {
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(600, ctx.currentTime); osc.frequency.setValueAtTime(800, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.15); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch (e) {}
   };
 
-  const showPushNotification = (title: string, body: string) => {
-    if (!("Notification" in window)) return;
-    if (Notification.permission === "granted") {
-      try {
-        new Notification(title, { body, icon: '/logo.png' });
-      } catch (e) {
-        console.error("Ошибка показа Push:", e);
-      }
-    }
+  const showInAppNotification = (title: string, message: string) => {
+    setInAppNotif({ title, message });
+    playSound(sound || 's1'); // Проигрываем звук из настроек
+    setTimeout(() => {
+      setInAppNotif(null);
+    }, 4000);
   };
 
   const formatMoney = (val: number | string | undefined) => {
@@ -193,7 +211,6 @@ export default function Dashboard() {
     return `${t.night}, ${firstName} 👋`;
   };
 
-  // ОСНОВНОЙ ЗАПРОС И ПРОВЕРКА НОВЫХ УВЕДОМЛЕНИЙ
   const fetchDashboard = async () => {
     try {
       const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
@@ -204,12 +221,11 @@ export default function Dashboard() {
         
         const newNotifs = data.notifications || [];
         
-        // ЕСЛИ ЕСТЬ УВЕДОМЛЕНИЯ
         if (newNotifs.length > 0) {
           const currentLatestId = newNotifs[0].id;
-          // Если это не первая загрузка и появился новый ID -> Стреляем пушем
           if (!isFirstLoadRef.current && latestNotifIdRef.current !== currentLatestId) {
-            showPushNotification('NXT-D Bank', newNotifs[0].message);
+            // Вызываем наше красивое окно
+            showInAppNotification('NXT-D Bank', newNotifs[0].message);
           }
           latestNotifIdRef.current = currentLatestId;
         } else {
@@ -293,7 +309,6 @@ export default function Dashboard() {
     return () => clearTimeout(delay);
   }, [transferData.rawPhone, transferData.cardOrAccount, transferTab, selectedCountry, token]);
 
-  // ЦИКЛ ПРОВЕРКИ (РАДАР КАЖДЫЕ 5 СЕК)
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
@@ -366,7 +381,7 @@ export default function Dashboard() {
         setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
         setTransferStatus(''); 
         fetchRecentRecipients(); 
-        fetchDashboard(); // Вызов обновления (это спровоцирует пуш об отправке)
+        fetchDashboard(); 
       } else { 
         const err = await response.json();
         setTransferStatus(err.message || 'Ошибка'); 
@@ -394,6 +409,31 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
+      
+      {/* --- КРАСИВОЕ IN-APP УВЕДОМЛЕНИЕ СВЕРХУ --- */}
+      <AnimatePresence>
+        {inAppNotif && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: '-50%' }}
+            animate={{ opacity: 1, y: 24, x: '-50%' }}
+            exit={{ opacity: 0, y: -50, x: '-50%' }}
+            className="fixed top-0 left-1/2 z-[9999] w-[90%] max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 p-4 flex items-start gap-4"
+          >
+            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shrink-0 shadow-md">
+              <span className="text-white font-black text-lg">N</span>
+            </div>
+            <div className="flex-1 mt-0.5">
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-tight mb-1">{inAppNotif.title}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{inAppNotif.message}</p>
+            </div>
+            <button onClick={() => setInAppNotif(null)} className="text-slate-400 hover:text-slate-600 transition p-1">
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* ------------------------------------------- */}
+
       <aside className="w-full md:w-64 bg-white dark:bg-[#0A192F] border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 flex flex-col justify-between md:min-h-screen z-10 relative transition-colors duration-300">
         <div>
           <div className="p-8 hidden md:block">
@@ -426,7 +466,7 @@ export default function Dashboard() {
               <button 
                 onMouseEnter={() => setIsBellHovered(true)} 
                 onMouseLeave={() => setIsBellHovered(false)} 
-                onClick={() => { setIsNotifOpen(!isNotifOpen); requestPushPermission(); }} // ЗАПРОС ПРИ КЛИКЕ НА КОЛОКОЛЬЧИК
+                onClick={() => setIsNotifOpen(!isNotifOpen)} 
                 className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm relative text-slate-500 hover:text-blue-500 transition focus:outline-none"
               >
                 <motion.div animate={isBellHovered ? { rotate: [0, 15, -15, 15, -15, 0] } : {}} transition={{ duration: 0.5 }}><Bell className="w-6 h-6" /></motion.div>
@@ -487,13 +527,7 @@ export default function Dashboard() {
               </motion.div>
             </div>
             
-            <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p>
-            <button 
-              onClick={() => { setIsTransferModalOpen(true); requestPushPermission(); }} // ЗАПРОС ПРИ КЛИКЕ НА ПЕРЕВОД
-              className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20"
-            >
-              {t.newTrans}
-            </button></div></div>
+            <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p><button onClick={() => setIsTransferModalOpen(true)} className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20">{t.newTrans}</button></div></div>
           </div>
         </div>
       </main>
