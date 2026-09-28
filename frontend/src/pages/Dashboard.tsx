@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
-import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Globe, Download } from 'lucide-react';
+import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Globe, Download, QrCode, ScanLine } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 const cardDesigns = [
   { id: 'blue', classes: 'from-[#0A192F] via-[#112240] to-blue-900', name: 'Classic Blue' },
@@ -40,9 +41,9 @@ const BANKS = [
 ];
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По номеру карты', amount: 'Сумма', comment: 'Сообщение получателю', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить', currTitle: 'Смена валюты', currDesc: 'Вы выбрали карту страны. Изменить вашу основную валюту на', yes: 'Да', no: 'Нет', continue: 'Продолжить', receipt: 'Квитанция', done: 'Готово', selectMethod: 'Куда перевести?', close: 'Закрыть' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card Number', amount: 'Amount', comment: 'Message to recipient', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change', currTitle: 'Change currency?', currDesc: 'You selected a country card. Change your main currency to', yes: 'Yes', no: 'No', continue: 'Continue', receipt: 'Receipt', done: 'Done', selectMethod: 'Where to transfer?', close: 'Close' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Mensaje al destinatario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar', currTitle: 'Cambiar moneda?', currDesc: 'Ha seleccionado una tarjeta de país. ¿Desea cambiar su moneda a', yes: 'Sí', no: 'No', continue: 'Continuar', receipt: 'Recibo', done: 'Hecho', selectMethod: '¿A dónde transferir?', close: 'Cerrar' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', acc: 'Основной счет', transfers: 'Переводы', transDesc: 'Мгновенная отправка средств.', newTrans: 'Новый перевод', notif: 'Уведомления', readAll: 'Прочитать все', noNotif: 'Нет новых уведомлений', cardManage: 'Управление картой', lock: 'Блок.', freeze: 'Замор.', details: 'Реквизиты', exp: 'Срок', phone: 'По телефону', card: 'По номеру карты', amount: 'Сумма', comment: 'Сообщение получателю', send: 'Перевести', morning: 'Доброе утро', day: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи', soon: 'Ожидайте в обновлениях!', copied: 'Скопировано!', recipientFound: 'Получатель', recent: 'Недавние переводы', logoutTitle: 'Выйти из аккаунта?', logoutDesc: 'Вам потребуется заново ввести данные для входа.', cancel: 'Отмена', logoutBtn: 'Выйти', pinTitle: 'Защита аккаунта', pinDesc1: 'Придумайте 4-значный PIN-код для входа', pinDesc2: 'Повторите придуманный PIN-код', pinMismatch: 'Не совпадает. Попробуйте еще раз', pinSuccess: 'PIN-код установлен!', cardNameLabel: 'Название счета', saveBtn: 'Сохранить', changeBtn: 'Изменить', currTitle: 'Смена валюты', currDesc: 'Вы выбрали карту страны. Изменить вашу основную валюту на', yes: 'Да', no: 'Нет', continue: 'Продолжить', receipt: 'Квитанция', done: 'Готово', selectMethod: 'Куда перевести?', close: 'Закрыть', qrTitle: 'QR-Перевод', myQr: 'Мой код', scanQr: 'Сканировать', showQr: 'Покажите этот код для получения перевода', pointCamera: 'Наведите камеру на QR-код' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', acc: 'Main Account', transfers: 'Transfers', transDesc: 'Instant money transfers.', newTrans: 'New Transfer', notif: 'Notifications', readAll: 'Read all', noNotif: 'No new notifications', cardManage: 'Card Management', lock: 'Lock', freeze: 'Freeze', details: 'Details', exp: 'Expiry', phone: 'By Phone', card: 'By Card Number', amount: 'Amount', comment: 'Message to recipient', send: 'Send', morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night', soon: 'Coming soon!', copied: 'Copied!', recipientFound: 'Recipient', recent: 'Recent transfers', logoutTitle: 'Log out?', logoutDesc: 'You will need to enter your credentials again.', cancel: 'Cancel', logoutBtn: 'Log out', pinTitle: 'Account Security', pinDesc1: 'Create a 4-digit PIN for login', pinDesc2: 'Confirm your new PIN', pinMismatch: 'Does not match. Try again', pinSuccess: 'PIN code set!', cardNameLabel: 'Account Name', saveBtn: 'Save', changeBtn: 'Change', currTitle: 'Change currency?', currDesc: 'You selected a country card. Change your main currency to', yes: 'Yes', no: 'No', continue: 'Continue', receipt: 'Receipt', done: 'Done', selectMethod: 'Where to transfer?', close: 'Close', qrTitle: 'QR Transfer', myQr: 'My Code', scanQr: 'Scan', showQr: 'Show this code to receive a transfer', pointCamera: 'Point camera at QR code' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', acc: 'Cuenta Principal', transfers: 'Transferencias', transDesc: 'Envío instantáneo de fondos.', newTrans: 'Nueva transferencia', notif: 'Notificaciones', readAll: 'Leer todo', noNotif: 'No hay notificaciones', cardManage: 'Gestión de Tarjeta', lock: 'Bloq.', freeze: 'Congel.', details: 'Detalles', exp: 'Caduca', phone: 'Por Teléfono', card: 'Por Tarjeta', amount: 'Cantidad', comment: 'Mensaje al destinatario', send: 'Enviar', morning: 'Buenos días', day: 'Buenas tardes', evening: 'Buenas noches', night: 'Buenas noches', soon: '¡Próximamente!', copied: '¡Copiado!', recipientFound: 'Destinatario', recent: 'Transferencias recientes', logoutTitle: '¿Cerrar sesión?', logoutDesc: 'Deberá volver a introducir sus credenciales.', cancel: 'Cancelar', logoutBtn: 'Salir', pinTitle: 'Seguridad', pinDesc1: 'Cree un PIN de 4 dígitos', pinDesc2: 'Confirme su nuevo PIN', pinMismatch: 'No coincide. Inténtalo de nuevo', pinSuccess: '¡PIN configurado!', cardNameLabel: 'Nombre de la cuenta', saveBtn: 'Guardar', changeBtn: 'Cambiar', currTitle: 'Cambiar moneda?', currDesc: 'Ha seleccionado una tarjeta de país. ¿Desea cambiar su moneda a', yes: 'Sí', no: 'No', continue: 'Continuar', receipt: 'Recibo', done: 'Hecho', selectMethod: '¿A dónde transferir?', close: 'Cerrar', qrTitle: 'Transferencia QR', myQr: 'Mi Código', scanQr: 'Escanear', showQr: 'Muestre este código para recibir una transferencia', pointCamera: 'Apunta la cámara al código QR' }
 };
 
 type TransferStep = 'select' | 'phone_input' | 'phone_details' | 'card_details' | 'processing' | 'success_phone' | 'success_card';
@@ -84,6 +85,10 @@ export default function Dashboard() {
   const [pinError, setPinError] = useState('');
 
   const [inAppNotif, setInAppNotif] = useState<{title: string, message: string} | null>(null);
+
+  // --- QR СОСТОЯНИЯ ---
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [qrTab, setQrTab] = useState<'scan' | 'code'>('code');
 
   const isFirstLoadRef = useRef(true);
   const latestNotifIdRef = useRef<string | null>(null);
@@ -398,6 +403,28 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // --- ОБРАБОТКА СКАНА QR-КОДА ---
+  const handleQrScan = (detected: any) => {
+    let text = '';
+    if (Array.isArray(detected)) {
+        text = detected[0]?.rawValue || '';
+    } else if (typeof detected === 'object' && detected !== null) {
+        text = detected.text || detected.rawValue || '';
+    } else if (typeof detected === 'string') {
+        text = detected;
+    }
+
+    if (!text) return;
+
+    const rawNum = text.replace(/\D/g, '');
+    if (rawNum.length >= 16) {
+        setIsQrModalOpen(false);
+        setTransferData({ rawPhone: '', cardOrAccount: rawNum, amount: '', comment: '' });
+        setTransferStep('card_details');
+        setIsTransferModalOpen(true);
+    }
+  };
+
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault(); 
     setTransferStatus('');
@@ -460,6 +487,9 @@ export default function Dashboard() {
 
   const safeCurrency = userData?.account?.currency || 'RUB';
   const safeBalance = userData?.account?.balance || 0;
+
+  // Генерируем ссылку на QR картинку через публичный API 
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent('NXT:' + (userData?.cards?.[0]?.number || ''))}`;
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-300">
@@ -584,17 +614,70 @@ export default function Dashboard() {
                 <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div>
                 <h3 className="text-xl font-bold mb-2">{t.transfers}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p>
-                <button 
-                  onClick={() => { setIsTransferModalOpen(true); setTransferStep('select'); }}
-                  className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition"
-                >
-                  {t.newTrans}
-                </button>
+                
+                {/* --- КНОПКА ПЕРЕВОДА И КНОПКА QR --- */}
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setIsTransferModalOpen(true); setTransferStep('select'); }}
+                    className="flex-1 bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition"
+                  >
+                    {t.newTrans}
+                  </button>
+                  <button 
+                    onClick={() => { setQrTab(window.innerWidth < 768 ? 'scan' : 'code'); setIsQrModalOpen(true); }}
+                    className="w-[60px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-blue-500 flex items-center justify-center rounded-xl transition"
+                  >
+                    <QrCode className="w-6 h-6" />
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* --- МОДАЛЬНОЕ ОКНО QR --- */}
+      <AnimatePresence>
+        {isQrModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-[#1C1C1E] w-full max-w-sm rounded-[2rem] shadow-2xl flex flex-col overflow-hidden relative border border-white/10">
+              <div className="p-5 flex items-center justify-between shrink-0 border-b border-white/5">
+                <div className="w-10"></div>
+                <h2 className="text-[17px] font-semibold text-white">{t.qrTitle}</h2>
+                <button onClick={() => setIsQrModalOpen(false)} className="p-2 -mr-2 text-slate-400 hover:text-white transition z-10"><X className="w-5 h-5" /></button>
+              </div>
+
+              <div className="flex bg-[#2C2C2E] rounded-xl p-1 m-5 mb-0">
+                <button onClick={() => setQrTab('scan')} className={`flex-1 py-2 text-sm font-semibold rounded-lg transition flex items-center justify-center gap-2 ${qrTab === 'scan' ? 'bg-[#3C3C3E] shadow-sm text-white' : 'text-slate-400 hover:text-white'}`}><ScanLine className="w-4 h-4"/> {t.scanQr}</button>
+                <button onClick={() => setQrTab('code')} className={`flex-1 py-2 text-sm font-semibold rounded-lg transition flex items-center justify-center gap-2 ${qrTab === 'code' ? 'bg-[#3C3C3E] shadow-sm text-white' : 'text-slate-400 hover:text-white'}`}><QrCode className="w-4 h-4"/> {t.myQr}</button>
+              </div>
+
+              <div className="p-6 pt-5 flex-1 flex flex-col items-center justify-center min-h-[350px]">
+                {qrTab === 'code' ? (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center">
+                    <div className="bg-white p-4 rounded-3xl shadow-xl mb-6">
+                      <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48 rounded-xl object-contain" />
+                    </div>
+                    <p className="text-white font-medium text-lg mb-1">{userData?.client}</p>
+                    <p className="text-slate-400 text-sm text-center px-4 leading-relaxed">{t.showQr}</p>
+                  </motion.div>
+                ) : (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full flex flex-col items-center">
+                    <div className="w-full aspect-square bg-black rounded-3xl overflow-hidden relative shadow-inner">
+                       <Scanner onScan={handleQrScan} onError={(e) => console.error(e)} />
+                       <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+                         <div className="w-48 h-48 border-[3px] border-blue-500/80 rounded-2xl"></div>
+                       </div>
+                    </div>
+                    <p className="text-slate-400 text-sm mt-6 text-center">{t.pointCamera}</p>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isCardModalOpen && (
