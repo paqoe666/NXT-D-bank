@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { LogOut, Send, CreditCard, History, Settings, Bell, X, Smartphone, FileText, Lock, Snowflake, Copy, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Globe } from 'lucide-react';
@@ -71,8 +71,30 @@ export default function Dashboard() {
   const [pinCode, setPinCode] = useState('');
   const [pinConfirm, setPinConfirm] = useState('');
   const [pinError, setPinError] = useState('');
+
+  // Рефы для логики пушей
+  const isFirstLoadRef = useRef(true);
+  const latestNotifIdRef = useRef<string | null>(null);
   
   const t = translations[language as keyof typeof translations] || translations.ru;
+
+  // --- ФУНКЦИИ ДЛЯ PUSH-УВЕДОМЛЕНИЙ ---
+  const requestPushPermission = () => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  };
+
+  const showPushNotification = (title: string, body: string) => {
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "granted") {
+      try {
+        new Notification(title, { body, icon: '/logo.png' });
+      } catch (e) {
+        console.error("Ошибка показа Push:", e);
+      }
+    }
+  };
 
   const formatMoney = (val: number | string | undefined) => {
     if (val === undefined || val === null) return '0';
@@ -171,6 +193,7 @@ export default function Dashboard() {
     return `${t.night}, ${firstName} 👋`;
   };
 
+  // ОСНОВНОЙ ЗАПРОС И ПРОВЕРКА НОВЫХ УВЕДОМЛЕНИЙ
   const fetchDashboard = async () => {
     try {
       const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
@@ -178,7 +201,23 @@ export default function Dashboard() {
         const data = await response.json();
         setUserData(data);
         setActiveDesignIndex(data.cards?.[0]?.designIndex || 0);
-        setNotifications(data.notifications || []);
+        
+        const newNotifs = data.notifications || [];
+        
+        // ЕСЛИ ЕСТЬ УВЕДОМЛЕНИЯ
+        if (newNotifs.length > 0) {
+          const currentLatestId = newNotifs[0].id;
+          // Если это не первая загрузка и появился новый ID -> Стреляем пушем
+          if (!isFirstLoadRef.current && latestNotifIdRef.current !== currentLatestId) {
+            showPushNotification('NXT-D Bank', newNotifs[0].message);
+          }
+          latestNotifIdRef.current = currentLatestId;
+        } else {
+          latestNotifIdRef.current = null;
+        }
+        
+        isFirstLoadRef.current = false;
+        setNotifications(newNotifs);
       } else logout();
     } catch (error) { console.error(error); } finally { setLoading(false); }
   };
@@ -254,13 +293,19 @@ export default function Dashboard() {
     return () => clearTimeout(delay);
   }, [transferData.rawPhone, transferData.cardOrAccount, transferTab, selectedCountry, token]);
 
+  // ЦИКЛ ПРОВЕРКИ (РАДАР КАЖДЫЕ 5 СЕК)
   useEffect(() => { 
     if (token) {
       fetchDashboard(); 
       fetchRecentRecipients(); 
+      const intervalId = setInterval(() => { fetchDashboard(); }, 5000);
+      
       const handleFocus = () => { fetchDashboard(); fetchRecentRecipients(); };
       window.addEventListener('focus', handleFocus);
-      return () => window.removeEventListener('focus', handleFocus);
+      return () => {
+        clearInterval(intervalId);
+        window.removeEventListener('focus', handleFocus);
+      };
     }
   }, [token]);
 
@@ -321,7 +366,7 @@ export default function Dashboard() {
         setTransferData({ rawPhone: '', cardOrAccount: '', amount: '', comment: '' }); 
         setTransferStatus(''); 
         fetchRecentRecipients(); 
-        fetchDashboard(); // ОБНОВЛЯЕМ ДАННЫЕ СРАЗУ ПОСЛЕ ПЕРЕВОДА
+        fetchDashboard(); // Вызов обновления (это спровоцирует пуш об отправке)
       } else { 
         const err = await response.json();
         setTransferStatus(err.message || 'Ошибка'); 
@@ -378,7 +423,15 @@ export default function Dashboard() {
             <motion.h2 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{getGreeting(userData.client)}</motion.h2>
             
             <div className="relative z-40">
-              <button onMouseEnter={() => setIsBellHovered(true)} onMouseLeave={() => setIsBellHovered(false)} onClick={() => setIsNotifOpen(!isNotifOpen)} className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm relative text-slate-500 hover:text-blue-500 transition focus:outline-none"><motion.div animate={isBellHovered ? { rotate: [0, 15, -15, 15, -15, 0] } : {}} transition={{ duration: 0.5 }}><Bell className="w-6 h-6" /></motion.div>{notifications.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>}</button>
+              <button 
+                onMouseEnter={() => setIsBellHovered(true)} 
+                onMouseLeave={() => setIsBellHovered(false)} 
+                onClick={() => { setIsNotifOpen(!isNotifOpen); requestPushPermission(); }} // ЗАПРОС ПРИ КЛИКЕ НА КОЛОКОЛЬЧИК
+                className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm relative text-slate-500 hover:text-blue-500 transition focus:outline-none"
+              >
+                <motion.div animate={isBellHovered ? { rotate: [0, 15, -15, 15, -15, 0] } : {}} transition={{ duration: 0.5 }}><Bell className="w-6 h-6" /></motion.div>
+                {notifications.length > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>}
+              </button>
               <AnimatePresence>
                 {isNotifOpen && (
                   <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden">
@@ -434,7 +487,13 @@ export default function Dashboard() {
               </motion.div>
             </div>
             
-            <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p><button onClick={() => setIsTransferModalOpen(true)} className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20">{t.newTrans}</button></div></div>
+            <div className="lg:col-span-1 flex flex-col gap-6"><div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none"><div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4"><Send className="w-6 h-6" /></div><h3 className="text-xl font-bold mb-2">{t.transfers}</h3><p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t.transDesc}</p>
+            <button 
+              onClick={() => { setIsTransferModalOpen(true); requestPushPermission(); }} // ЗАПРОС ПРИ КЛИКЕ НА ПЕРЕВОД
+              className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20"
+            >
+              {t.newTrans}
+            </button></div></div>
           </div>
         </div>
       </main>
@@ -571,7 +630,6 @@ export default function Dashboard() {
                       </div>
                     )}
                     
-                    {/* ВОТ ТОТ САМЫЙ БЛОК КОТОРЫЙ Я ЗАБЫЛ */}
                     <AnimatePresence>
                       {recipientName && (
                         <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 12 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
