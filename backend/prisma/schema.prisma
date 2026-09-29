@@ -19,6 +19,10 @@ model User {
   role      String   @default("user") // 'user' или 'ceo'
   theme     String   @default("light")
   language  String   @default("ru")
+
+  // Лимиты переводов (в валюте счета). null = лимит не задан
+  dailyLimit   Float?
+  monthlyLimit Float?
   
   account       Account?
   cards         Card[]

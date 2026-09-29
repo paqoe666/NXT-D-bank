@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { findUserByAnyTarget } from '../services/lookup.service';
 import { TX_STATUS, processDueTransfers, cancelTransfer as cancelReservedTransfer, convertCurrency } from '../services/ledger.service';
+import { checkTransferLimit } from '../services/limits.service';
 
 
 // Тексты статусов для сообщений пользователю
@@ -106,36 +107,50 @@ export const transferMoney = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     const cleanTarget = String(target).replace(/[\s-]/g, '');
+    const senderAccountId = sender.account.id;
+    const senderCurrency = sender.account.currency;
 
-    // 1. Резервируем сумму на счете отправителя и создаем операцию в статусе pending.
+    // 1. В одной транзакции: проверяем лимиты, резервируем деньги и создаем операцию в статусе pending.
     // Условный updateMany (balance >= amount) защищает от гонок: два одновременных перевода
-    // не смогут списать больше, чем есть на счете.
-    const created = await prisma.$transaction(async (db) => {
+    // не смогут списать больше, чем есть на счете, и не обойдут лимит.
+    const result = await prisma.$transaction(async (db) => {
+      const limitError = await checkTransferLimit(db, senderId, transferAmount);
+      if (limitError) return { limitError };
+
       const reserved = await db.account.updateMany({
-        where: { id: sender.account!.id, balance: { gte: transferAmount } },
+        where: { id: senderAccountId, balance: { gte: transferAmount } },
         data: { balance: { decrement: transferAmount }, held: { increment: transferAmount } }
       });
-      if (reserved.count === 0) return null;
+      if (reserved.count === 0) return { insufficient: true };
 
-      return db.transaction.create({
+      const created = await db.transaction.create({
         data: {
           type: 'transfer',
           status: TX_STATUS.pending,
           amount: transferAmount,
           totalDeducted: transferAmount,
-          currency: sender.account!.currency,
+          currency: senderCurrency,
           senderId: sender.id,
           receiverId: receiver.id,
           target: cleanTarget,
           comment: comment || 'Перевод средств'
         }
       });
+
+      return { created };
     });
 
-    if (!created) {
-      res.status(400).json({ message: `Недостаточно средств. Доступно: ${sender.account.balance} ${sender.account.currency}` });
+    if ('limitError' in result) {
+      res.status(400).json({ message: result.limitError });
       return;
     }
+
+    if ('insufficient' in result) {
+      res.status(400).json({ message: `Недостаточно средств. Доступно: ${sender.account.balance} ${senderCurrency}` });
+      return;
+    }
+
+    const created = result.created;
 
     await prisma.notification.create({
       data: {

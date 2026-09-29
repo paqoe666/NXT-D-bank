@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { CURRENCY_RATES, processDueTransfers } from '../services/ledger.service';
+import { getLimits } from '../services/limits.service';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -73,12 +74,24 @@ export const updateCurrency = async (req: AuthRequest, res: Response): Promise<v
     const rateOld = rates[oldCurrency] || 1;
     const rateNew = rates[newCurrency] || 1;
 
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
     const convert = (value: number) => Math.round((value * rateOld / rateNew) * 100) / 100;
 
-    await prisma.account.update({
-      where: { userId },
-      data: { currency: newCurrency, balance: convert(account.balance), held: convert(account.held) }
-    });
+    // Конвертируем и лимиты переводов: они хранятся в валюте счета
+    await prisma.$transaction([
+      prisma.account.update({
+        where: { userId },
+        data: { currency: newCurrency, balance: convert(account.balance), held: convert(account.held) }
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          dailyLimit: user && user.dailyLimit != null ? convert(user.dailyLimit) : null,
+          monthlyLimit: user && user.monthlyLimit != null ? convert(user.monthlyLimit) : null
+        }
+      })
+    ]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };
@@ -122,4 +135,50 @@ export const updateCardName = async (req: AuthRequest, res: Response): Promise<v
     await prisma.card.update({ where: { id: cardId }, data: { cardName } });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
+};
+
+// --- Лимиты переводов ---
+export const getTransferLimits = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const limits = await getLimits(req.user.userId);
+    if (!limits) { res.status(404).json({ message: 'Пользователь не найден' }); return; }
+    res.json(limits);
+  } catch (error) {
+    console.error('Ошибка получения лимитов:', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+};
+
+export const updateTransferLimits = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    const { dailyLimit, monthlyLimit } = req.body;
+
+    // Пустая строка, 0 или -1 = лимит не задан
+    const parseLimit = (value: unknown): number | null | 'error' => {
+      if (value === null || value === undefined || value === '' || value === -1 || value === 0) return null;
+      const num = Number(value);
+      if (!Number.isFinite(num) || num <= 0) return 'error';
+      return Math.round(num * 100) / 100;
+    };
+
+    const daily = parseLimit(dailyLimit);
+    const monthly = parseLimit(monthlyLimit);
+
+    if (daily === 'error' || monthly === 'error') {
+      res.status(400).json({ message: 'Лимит должен быть положительным числом или пустым (без лимита)' });
+      return;
+    }
+    if (daily !== null && monthly !== null && daily > monthly) {
+      res.status(400).json({ message: 'Дневной лимит не может быть больше месячного' });
+      return;
+    }
+
+    await prisma.user.update({ where: { id: userId }, data: { dailyLimit: daily, monthlyLimit: monthly } });
+    const limits = await getLimits(userId);
+    res.json({ success: true, ...limits });
+  } catch (error) {
+    console.error('Ошибка сохранения лимитов:', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
 };

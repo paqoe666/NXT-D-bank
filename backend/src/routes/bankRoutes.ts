@@ -6,7 +6,9 @@ import {
   updateCurrency, 
   updatePassword, 
   resolveRecipient,
-  updateCardName // <--- добавили этот метод
+  updateCardName,
+  getTransferLimits,
+  updateTransferLimits
 } from '../controllers/bank';
 import { transferMoney, getHistory, clearHistory, cancelTransfer, refundTransfer } from '../controllers/transaction';
 import { ceoDeposit } from '../controllers/ceoController';
@@ -31,6 +33,8 @@ router.post('/card/design', updateCardDesign);
 router.post('/notifications/read', markNotificationsRead);
 router.post('/currency', updateCurrency);
 router.post('/password', updatePassword);
-router.post('/card/name', updateCardName); // <--- и новый маршрут
+router.post('/card/name', updateCardName);
+router.get('/limits', getTransferLimits);
+router.post('/limits', updateTransferLimits);
 
 export default router;

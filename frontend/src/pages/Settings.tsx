@@ -5,9 +5,9 @@ import { LogOut, CreditCard, History, Settings as SettingsIcon, Moon, Sun, Globe
 import { useNavigate } from 'react-router-dom';
 
 const translations = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'Настройки', pref: 'Предпочтения', theme: 'Оформление', themeDesc: 'Светлая/Тёмная тема', lang: 'Язык', langDesc: 'Основной язык', curr: 'Валюта', currDesc: 'По умолчанию', sound: 'Звук уведомлений', soundDesc: 'Мелодия при переводах', s1: 'Звоночек', s2: 'Мягкий клик', s3: 'Двойной сигнал', off: 'Без звука', sec: 'Безопасность', oldPass: 'Текущий пароль', newPass: 'Новый пароль', confPass: 'Повторите новый пароль', updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно', changePin: 'Сбросить PIN-код', pinCleared: 'Сброшено! Установите новый на Главной.', cardNumber: 'Номер карты получателя', amount: 'Сумма' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Settings', pref: 'Preferences', theme: 'Appearance', themeDesc: 'Light/Dark mode', lang: 'Language', langDesc: 'Main language', curr: 'Currency', currDesc: 'Default currency', sound: 'Notification Sound', soundDesc: 'Transfer alert melody', s1: 'Chime', s2: 'Soft Pop', s3: 'Double Beep', off: 'Muted', sec: 'Security', oldPass: 'Current password', newPass: 'New password', confPass: 'Confirm new password', updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success', changePin: 'Reset PIN code', pinCleared: 'Reset! Set a new one on Dashboard.', cardNumber: 'Recipient Card Number', amount: 'Amount' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Ajustes', pref: 'Preferencias', theme: 'Apariencia', themeDesc: 'Modo claro/oscuro', lang: 'Idioma', langDesc: 'Idioma principal', curr: 'Moneda', currDesc: 'Moneda predeterminada', sound: 'Sonido de notif.', soundDesc: 'Melodía de alerta', s1: 'Campana', s2: 'Clic suave', s3: 'Doble pitido', off: 'Silenciado', sec: 'Seguridad', oldPass: 'Contraseña actual', newPass: 'Nueva contraseña', confPass: 'Confirmar contraseña', updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito', changePin: 'Restablecer PIN', pinCleared: '¡Restablecido! Configura uno nuevo en Inicio.', cardNumber: 'Número de tarjeta', amount: 'Cantidad' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'Настройки', pref: 'Предпочтения', theme: 'Оформление', themeDesc: 'Светлая/Тёмная тема', lang: 'Язык', langDesc: 'Основной язык', curr: 'Валюта', currDesc: 'По умолчанию', sound: 'Звук уведомлений', soundDesc: 'Мелодия при переводах', s1: 'Звоночек', s2: 'Мягкий клик', s3: 'Двойной сигнал', off: 'Без звука', sec: 'Безопасность', oldPass: 'Текущий пароль', newPass: 'Новый пароль', confPass: 'Повторите новый пароль', updPass: 'Обновить пароль', logout: 'Выйти из аккаунта', ceo: 'Панель CEO', passMatchErr: 'Пароли не совпадают', passSuccess: 'Успешно', changePin: 'Сбросить PIN-код', pinCleared: 'Сброшено! Установите новый на Главной.', cardNumber: 'Номер карты получателя', amount: 'Сумма', limits: 'Лимиты переводов', limitsDesc: 'Ограничьте, сколько можно перевести в день и в месяц. Пусто — без лимита.', dailyLimit: 'Дневной лимит', monthlyLimit: 'Месячный лимит', noLimit: 'Без лимита', saveLimits: 'Сохранить лимиты', limitsSaved: 'Лимиты сохранены', spentToday: 'Переведено сегодня', spentMonth: 'Переведено за месяц' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Settings', pref: 'Preferences', theme: 'Appearance', themeDesc: 'Light/Dark mode', lang: 'Language', langDesc: 'Main language', curr: 'Currency', currDesc: 'Default currency', sound: 'Notification Sound', soundDesc: 'Transfer alert melody', s1: 'Chime', s2: 'Soft Pop', s3: 'Double Beep', off: 'Muted', sec: 'Security', oldPass: 'Current password', newPass: 'New password', confPass: 'Confirm new password', updPass: 'Update password', logout: 'Sign out', ceo: 'CEO Panel', passMatchErr: 'Passwords do not match', passSuccess: 'Success', changePin: 'Reset PIN code', pinCleared: 'Reset! Set a new one on Dashboard.', cardNumber: 'Recipient Card Number', amount: 'Amount', limits: 'Transfer limits', limitsDesc: 'Limit how much you can transfer per day and per month. Empty = no limit.', dailyLimit: 'Daily limit', monthlyLimit: 'Monthly limit', noLimit: 'No limit', saveLimits: 'Save limits', limitsSaved: 'Limits saved', spentToday: 'Transferred today', spentMonth: 'Transferred this month' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Ajustes', pref: 'Preferencias', theme: 'Apariencia', themeDesc: 'Modo claro/oscuro', lang: 'Idioma', langDesc: 'Idioma principal', curr: 'Moneda', currDesc: 'Moneda predeterminada', sound: 'Sonido de notif.', soundDesc: 'Melodía de alerta', s1: 'Campana', s2: 'Clic suave', s3: 'Doble pitido', off: 'Silenciado', sec: 'Seguridad', oldPass: 'Contraseña actual', newPass: 'Nueva contraseña', confPass: 'Confirmar contraseña', updPass: 'Actualizar contraseña', logout: 'Cerrar sesión', ceo: 'Panel CEO', passMatchErr: 'Las contraseñas no coinciden', passSuccess: 'Éxito', changePin: 'Restablecer PIN', pinCleared: '¡Restablecido! Configura uno nuevo en Inicio.', cardNumber: 'Número de tarjeta', amount: 'Cantidad', limits: 'Límites de transferencias', limitsDesc: 'Limita cuánto puedes transferir por día y por mes. Vacío = sin límite.', dailyLimit: 'Límite diario', monthlyLimit: 'Límite mensual', noLimit: 'Sin límite', saveLimits: 'Guardar límites', limitsSaved: 'Límites guardados', spentToday: 'Transferido hoy', spentMonth: 'Transferido este mes' }
 };
 
 const allCurrencies = [
@@ -39,6 +39,12 @@ export default function Settings() {
   const [ceoStatus, setCeoStatus] = useState('');
   const [ceoOk, setCeoOk] = useState(false);
 
+  // Лимиты переводов
+  const [limits, setLimits] = useState<any>(null);
+  const [limitForm, setLimitForm] = useState({ daily: '', monthly: '' });
+  const [limitStatus, setLimitStatus] = useState('');
+  const [limitOk, setLimitOk] = useState(false);
+
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isCurrOpen, setIsCurrOpen] = useState(false);
   const [isSoundOpen, setIsSoundOpen] = useState(false);
@@ -58,6 +64,16 @@ export default function Settings() {
           const data = await response.json();
           setUserData(data);
           setCurrency(data.account?.currency || 'RUB');
+
+          const limitsRes = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/limits', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (limitsRes.ok) {
+            const limitsData = await limitsRes.json();
+            setLimits(limitsData);
+            setLimitForm({
+              daily: limitsData.dailyLimit === null ? '' : String(limitsData.dailyLimit),
+              monthly: limitsData.monthlyLimit === null ? '' : String(limitsData.monthlyLimit)
+            });
+          }
         } else handleLogout();
       } catch (error) { console.error('Ошибка', error); } finally { setLoading(false); }
     };
@@ -104,6 +120,28 @@ export default function Settings() {
       const data = await response.json();
       if (response.ok) { setPassStatus('ok'); setTimeout(() => { setPassStatus(''); setPasswordForm({ old: '', new: '', confirm: '' }); }, 2000); } else { setPassStatus(data.message || 'Error'); }
     } catch (error) { setPassStatus('Error'); }
+  };
+
+  const handleSaveLimits = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLimitStatus('...'); setLimitOk(false);
+    try {
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/limits', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ dailyLimit: limitForm.daily, monthlyLimit: limitForm.monthly })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setLimits(data);
+        setLimitOk(true);
+        setLimitStatus(t.limitsSaved);
+        setLimitForm({
+          daily: data.dailyLimit === null ? '' : String(data.dailyLimit),
+          monthly: data.monthlyLimit === null ? '' : String(data.monthlyLimit)
+        });
+        setTimeout(() => { setLimitStatus(''); setLimitOk(false); }, 4000);
+      } else { setLimitStatus(data.message || 'Ошибка'); }
+    } catch (error) { setLimitStatus('Ошибка сети'); }
   };
 
   const handleResetPin = () => {
@@ -267,6 +305,50 @@ export default function Settings() {
                   </div>
                 </div>
 
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="flex flex-col gap-6">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none transition-colors duration-300">
+                <h3 className="text-lg font-bold mb-1 flex items-center gap-2 text-slate-900 dark:text-white"><DollarSign className="w-5 h-5 text-blue-500" /> {t.limits}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.limitsDesc}</p>
+
+                <form onSubmit={handleSaveLimits} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">{t.dailyLimit}</label>
+                    <input type="number" min="0" step="any" placeholder={t.noLimit} value={limitForm.daily} onChange={(e) => setLimitForm({ ...limitForm, daily: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">{t.monthlyLimit}</label>
+                    <input type="number" min="0" step="any" placeholder={t.noLimit} value={limitForm.monthly} onChange={(e) => setLimitForm({ ...limitForm, monthly: e.target.value })} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <button type="submit" className="w-full bg-[#0A192F] dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">{t.saveLimits}</button>
+                  </div>
+                </form>
+
+                {limitStatus && (
+                  <div className={`mt-4 text-xs font-bold text-center flex items-center justify-center gap-2 rounded-xl p-3 ${limitOk ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>
+                    {limitOk && <CheckCircle2 className="w-4 h-4" />} {limitStatus}
+                  </div>
+                )}
+
+                {limits && (
+                  <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700 space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">{t.spentToday}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {limits.spentToday} {limits.currency}{limits.dailyLimit !== null ? ` / ${limits.dailyLimit}` : ''}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">{t.spentMonth}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {limits.spentMonth} {limits.currency}{limits.monthlyLimit !== null ? ` / ${limits.monthlyLimit}` : ''}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
 
