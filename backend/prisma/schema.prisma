@@ -32,6 +32,7 @@ model User {
 model Account {
   id       String @id @default(uuid())
   balance  Float  @default(0)
+  held     Float  @default(0) // зарезервировано под незавершенные операции (pending/processing)
   currency String @default("RUB") // RUB, USD, EUR
   userId   String @unique
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -55,11 +56,15 @@ model Card {
 model Transaction {
   id            String   @id @default(uuid())
   type          String   // 'transfer' или 'deposit'
-  status        String   // 'completed', 'failed_not_found', 'pending'
+  status        String   // 'pending' | 'processing' | 'completed' | 'failed' | 'canceled' | 'refunded'
   amount        Float
   totalDeducted Float    // Итоговая сумма списания (с учетом комиссии)
   currency      String   @default("RUB")
   commission    Float    @default(0)
+
+  failureReason String?   // причина отказа: recipient_not_found, insufficient_funds_on_recipient и т.п.
+  processedAt   DateTime? // когда операция завершилась (успешно или нет)
+  refundOfId    String?   // id исходной операции, если это возврат средств
   
   senderId      String?
   sender        User?    @relation("Sender", fields: [senderId], references: [id])

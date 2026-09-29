@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { CURRENCY_RATES, processDueTransfers } from '../services/ledger.service';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -8,6 +9,10 @@ const prisma = new PrismaClient();
 export const getDashboard = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user.userId;
+
+    // Продвигаем «созревшие» операции, чтобы статусы и балансы были актуальными
+    await processDueTransfers();
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -51,24 +56,29 @@ export const updateCurrency = async (req: AuthRequest, res: Response): Promise<v
     const userId = req.user.userId;
     const { currency: newCurrency } = req.body;
     const account = await prisma.account.findUnique({ where: { userId } });
-    if (!account) return;
+    if (!account) { res.status(404).json({ message: 'Счет не найден' }); return; }
 
     const oldCurrency = account.currency;
     if (oldCurrency === newCurrency) { res.json({ success: true }); return; }
 
-    const rates: Record<string, number> = {
-      'RUB': 1, 'USD': 80, 'EUR': 100, 'GBP': 120, 'UAH': 2.5,
-      'CNY': 12, 'CHF': 110, 'JPY': 0.6, 'BYN': 30, 'AED': 22, 'KZT': 0.2
-    };
+    // Пока есть незавершенные операции, менять валюту нельзя:
+    // зарезервированные суммы хранятся в старой валюте
+    if (account.held > 0) {
+      res.status(409).json({ message: 'Есть операции в обработке. Дождитесь их завершения или отмените их.' });
+      return;
+    }
+
+    const rates = CURRENCY_RATES;
 
     const rateOld = rates[oldCurrency] || 1;
     const rateNew = rates[newCurrency] || 1;
 
-    let balanceInRub = account.balance * rateOld;
-    let newBalance = balanceInRub / rateNew;
+    const convert = (value: number) => Math.round((value * rateOld / rateNew) * 100) / 100;
 
-    newBalance = Math.round(newBalance * 100) / 100;
-    await prisma.account.update({ where: { userId }, data: { currency: newCurrency, balance: newBalance } });
+    await prisma.account.update({
+      where: { userId },
+      data: { currency: newCurrency, balance: convert(account.balance), held: convert(account.held) }
+    });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };
@@ -78,7 +88,7 @@ export const updatePassword = async (req: AuthRequest, res: Response): Promise<v
     const userId = req.user.userId;
     const { oldPassword, newPassword } = req.body;
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) return;
+    if (!user) { res.status(404).json({ message: 'Пользователь не найден' }); return; }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) { res.status(400).json({ message: 'Неверный текущий пароль' }); return; }

@@ -151,6 +151,8 @@ export const getUserTransactions = async (req: Request, res: Response): Promise<
         totalDeducted: tx.totalDeducted,
         commission: tx.commission,
         currency: tx.currency,
+        failureReason: tx.failureReason,
+        processedAt: tx.processedAt,
         comment: tx.comment,
         counterparty,
         createdAt: tx.createdAt

@@ -7,9 +7,9 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 const translations: Record<string, any> = {
-  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'История операций', income: 'Пополнения и доходы', expense: 'Расходы и переводы', all: 'Все', incomes: 'Доходы', expenses: 'Расходы', searchText: 'Поиск операции...', listTitle: 'Список транзакций', notFound: 'Операции не найдены', clearHistory: 'Очистить историю', confirmClear: 'Вы уверены, что хотите удалить всю историю транзакций?', unknown: 'Неизвестный получатель', err: 'ОШИБКА', comm: 'Ком.', simNote: 'Учебный симулятор', success: 'Успешно', fail: 'Возврат / Ошибка', opId: 'ID Операции', dateTime: 'Дата и время', sender: 'Отправитель', receiver: 'Получатель', commission: 'Комиссия', comment: 'Комментарий', close: 'Закрыть', ceoDeposit: 'Пополнение счета CEO', repeat: 'Повторить перевод', downloadPdf: 'Скачать квитанцию (PDF)' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Transaction History', income: 'Deposits & Income', expense: 'Expenses & Transfers', all: 'All', incomes: 'Income', expenses: 'Expenses', searchText: 'Search transaction...', listTitle: 'Transactions List', notFound: 'No transactions found', clearHistory: 'Clear history', confirmClear: 'Are you sure you want to delete all transaction history?', unknown: 'Unknown recipient', err: 'ERROR', comm: 'Fee', simNote: 'Training Simulator', success: 'Success', fail: 'Refund / Error', opId: 'Operation ID', dateTime: 'Date & Time', sender: 'Sender', receiver: 'Receiver', commission: 'Fee', comment: 'Comment', close: 'Close', ceoDeposit: 'CEO Account Deposit', repeat: 'Repeat transfer', downloadPdf: 'Download PDF' },
-  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Historial de Transacciones', income: 'Depósitos', expense: 'Gastos', all: 'Todo', incomes: 'Ingresos', expenses: 'Gastos', searchText: 'Buscar...', listTitle: 'Lista de Transacciones', notFound: 'No se encontraron operaciones', clearHistory: 'Borrar historial', confirmClear: '¿Eliminar historial?', unknown: 'Desconocido', err: 'ERROR', comm: 'Com.', simNote: 'Simulador', success: 'Éxito', fail: 'Error', opId: 'ID de Operación', dateTime: 'Fecha y Hora', sender: 'Remitente', receiver: 'Destinatario', commission: 'Comisión', comment: 'Comentario', close: 'Cerrar', ceoDeposit: 'Depósito CEO', repeat: 'Repetir', downloadPdf: 'Descargar PDF' }
+  ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'История операций', income: 'Пополнения и доходы', expense: 'Расходы и переводы', all: 'Все', incomes: 'Доходы', expenses: 'Расходы', searchText: 'Поиск операции...', listTitle: 'Список транзакций', notFound: 'Операции не найдены', clearHistory: 'Очистить историю', confirmClear: 'Вы уверены, что хотите удалить всю историю транзакций?', unknown: 'Неизвестный получатель', err: 'ОШИБКА', comm: 'Ком.', simNote: 'Учебный симулятор', success: 'Успешно', fail: 'Возврат / Ошибка', opId: 'ID Операции', dateTime: 'Дата и время', sender: 'Отправитель', receiver: 'Получатель', commission: 'Комиссия', comment: 'Комментарий', close: 'Закрыть', ceoDeposit: 'Пополнение счета CEO', repeat: 'Повторить перевод', downloadPdf: 'Скачать квитанцию (PDF)', statusPending: 'В обработке', statusProcessing: 'Обрабатывается', statusFailed: 'Ошибка', statusCanceled: 'Отменена', statusRefunded: 'Возвращена', cancelOp: 'Отменить операцию', refundOp: 'Вернуть перевод', cancelConfirm: 'Отменить операцию? Деньги вернутся на счет.', refundConfirm: 'Вернуть деньги по этому переводу?' },
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Transaction History', income: 'Deposits & Income', expense: 'Expenses & Transfers', all: 'All', incomes: 'Income', expenses: 'Expenses', searchText: 'Search transaction...', listTitle: 'Transactions List', notFound: 'No transactions found', clearHistory: 'Clear history', confirmClear: 'Are you sure you want to delete all transaction history?', unknown: 'Unknown recipient', err: 'ERROR', comm: 'Fee', simNote: 'Training Simulator', success: 'Success', fail: 'Refund / Error', opId: 'Operation ID', dateTime: 'Date & Time', sender: 'Sender', receiver: 'Receiver', commission: 'Fee', comment: 'Comment', close: 'Close', ceoDeposit: 'CEO Account Deposit', repeat: 'Repeat transfer', downloadPdf: 'Download PDF', statusPending: 'Pending', statusProcessing: 'Processing', statusFailed: 'Failed', statusCanceled: 'Canceled', statusRefunded: 'Refunded', cancelOp: 'Cancel operation', refundOp: 'Refund transfer', cancelConfirm: 'Cancel this operation? The money will be returned.', refundConfirm: 'Refund this transfer?' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Historial de Transacciones', income: 'Depósitos', expense: 'Gastos', all: 'Todo', incomes: 'Ingresos', expenses: 'Gastos', searchText: 'Buscar...', listTitle: 'Lista de Transacciones', notFound: 'No se encontraron operaciones', clearHistory: 'Borrar historial', confirmClear: '¿Eliminar historial?', unknown: 'Desconocido', err: 'ERROR', comm: 'Com.', simNote: 'Simulador', success: 'Éxito', fail: 'Error', opId: 'ID de Operación', dateTime: 'Fecha y Hora', sender: 'Remitente', receiver: 'Destinatario', commission: 'Comisión', comment: 'Comentario', close: 'Cerrar', ceoDeposit: 'Depósito CEO', repeat: 'Repetir', downloadPdf: 'Descargar PDF', statusPending: 'En proceso', statusProcessing: 'Procesando', statusFailed: 'Error', statusCanceled: 'Cancelada', statusRefunded: 'Devuelta', cancelOp: 'Cancelar operación', refundOp: 'Devolver transferencia', cancelConfirm: '¿Cancelar la operación? El dinero será devuelto.', refundConfirm: '¿Devolver el dinero de esta transferencia?' }
 };
 
 export default function Operations() {
@@ -42,6 +42,46 @@ export default function Operations() {
     if (val === undefined || val === null) return '0';
     const num = Number(val);
     return isNaN(num) ? String(val) : num.toLocaleString('ru-RU');
+  };
+
+  // Как показывать статус операции (pending -> processing -> completed / failed / canceled / refunded)
+  const statusMeta = (status: string): { label: string; badge: string; text: string } => {
+    switch (status) {
+      case 'pending': return { label: t.statusPending, badge: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30', text: 'text-amber-500' };
+      case 'processing': return { label: t.statusProcessing, badge: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30', text: 'text-blue-500' };
+      case 'failed': return { label: t.statusFailed, badge: 'bg-red-100 text-red-600 dark:bg-red-900/30', text: 'text-red-500' };
+      case 'canceled': return { label: t.statusCanceled, badge: 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300', text: 'text-slate-500' };
+      case 'refunded': return { label: t.statusRefunded, badge: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30', text: 'text-orange-500' };
+      default: return { label: t.success, badge: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30', text: 'text-emerald-500' };
+    }
+  };
+
+  // Отмена операции, которая еще в обработке
+  const handleCancelTx = async () => {
+    if (!selectedTx || !token) return;
+    if (!window.confirm(t.cancelConfirm)) return;
+    try {
+      const res = await fetch(`https://nxt-d-bank-backend.onrender.com/api/bank/transfer/${selectedTx.id}/cancel`, {
+        method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { setSelectedTx(null); await fetchHistory(); }
+      else window.alert(data.message || 'Не удалось отменить операцию');
+    } catch { window.alert('Ошибка сети'); }
+  };
+
+  // Возврат по исполненному переводу
+  const handleRefundTx = async () => {
+    if (!selectedTx || !token) return;
+    if (!window.confirm(t.refundConfirm)) return;
+    try {
+      const res = await fetch(`https://nxt-d-bank-backend.onrender.com/api/bank/transfer/${selectedTx.id}/refund`, {
+        method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) { setSelectedTx(null); await fetchHistory(); }
+      else window.alert(data.message || 'Не удалось выполнить возврат');
+    } catch { window.alert('Ошибка сети'); }
   };
 
   const getCardSystem = (cardNumber: string) => {
@@ -158,6 +198,10 @@ export default function Operations() {
     try {
       const res = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/history', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) { setTransactions([]); fetchHistory(); }
+      else {
+        const data = await res.json().catch(() => ({}));
+        window.alert(data.message || 'Не удалось очистить историю');
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -330,7 +374,7 @@ export default function Operations() {
                               <h4 className="font-bold text-sm text-slate-900 dark:text-white">{targetName || t.unknown}</h4>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <span className="text-[11px] text-slate-500 font-medium">{formatDate(tx.createdAt)}</span>
-                                {tx.status === 'failed_recipient_not_found' && <span className="text-[9px] bg-red-100 text-red-600 px-2 py-0.2 rounded-full font-bold">{t.err}</span>}
+                                {tx.status !== 'completed' && <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${statusMeta(tx.status).badge}`}>{statusMeta(tx.status).label}</span>}
                               </div>
                             </div>
                           </div>
@@ -362,8 +406,10 @@ export default function Operations() {
                 
                 {selectedTx.status === 'completed' ? (
                   <div className="flex items-center gap-1.5 mt-2 text-emerald-500 font-bold text-xs"><CheckCircle2 className="w-4 h-4" /> {t.success}</div>
+                ) : selectedTx.status === 'pending' || selectedTx.status === 'processing' ? (
+                  <div className={`flex items-center gap-1.5 mt-2 font-bold text-xs ${statusMeta(selectedTx.status).text}`}>{statusMeta(selectedTx.status).label}</div>
                 ) : (
-                  <div className="flex items-center gap-1.5 mt-2 text-red-500 font-bold text-xs"><XCircle className="w-4 h-4" /> {t.fail}</div>
+                  <div className="flex items-center gap-1.5 mt-2 text-red-500 font-bold text-xs"><XCircle className="w-4 h-4" /> {statusMeta(selectedTx.status).label}</div>
                 )}
                 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-2">
@@ -419,6 +465,20 @@ export default function Operations() {
                     <RefreshCw className="w-4 h-4" /> {t.repeat}
                   </button>
                 )}
+
+                {/* Отмена возможна, пока операция в обработке */}
+                {selectedTx.senderId === myId && (selectedTx.status === 'pending' || selectedTx.status === 'processing') && (
+                  <button onClick={handleCancelTx} className="w-full py-3 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-xl font-bold flex items-center justify-center gap-2 transition text-xs">
+                    <XCircle className="w-4 h-4" /> {t.cancelOp}
+                  </button>
+                )}
+
+                {/* Возврат доступен по исполненному переводу */}
+                {selectedTx.senderId === myId && selectedTx.type === 'transfer' && selectedTx.status === 'completed' && (
+                  <button onClick={handleRefundTx} className="w-full py-3 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 rounded-xl font-bold flex items-center justify-center gap-2 transition text-xs">
+                    <RefreshCw className="w-4 h-4" /> {t.refundOp}
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>
@@ -465,7 +525,7 @@ export default function Operations() {
 
               <div>
                 <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Статус операции</p>
-                <p className="font-bold text-emerald-600">Исполнена</p>
+                <p className="font-bold">{statusMeta(selectedTx.status).label}</p>
                 <p className="text-sm text-slate-600 mt-1">{formatDate(selectedTx.createdAt)}</p>
               </div>
 

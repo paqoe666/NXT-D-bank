@@ -8,7 +8,7 @@ import {
   resolveRecipient,
   updateCardName // <--- добавили этот метод
 } from '../controllers/bank';
-import { transferMoney, getHistory, clearHistory } from '../controllers/transaction';
+import { transferMoney, getHistory, clearHistory, cancelTransfer, refundTransfer } from '../controllers/transaction';
 import { ceoDeposit } from '../controllers/ceoController';
 import { authenticateToken } from '../middlewares/authMiddleware';
 import { connectStream } from '../controllers/streamController';
@@ -22,6 +22,8 @@ router.get('/stream', connectStream);
 router.get('/dashboard', getDashboard);
 router.get('/resolve-recipient', resolveRecipient);
 router.post('/transfer', transferLimiter, transferMoney);
+router.post('/transfer/:id/cancel', cancelTransfer);
+router.post('/transfer/:id/refund', refundTransfer);
 router.get('/history', getHistory);
 router.delete('/history', clearHistory);
 router.post('/deposit', ceoDeposit);
