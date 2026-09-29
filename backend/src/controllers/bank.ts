@@ -114,22 +114,27 @@ export const updateCardName = async (req: AuthRequest, res: Response): Promise<v
   } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };
 
-// ИСПРАВЛЕНИЕ: Вернули функцию пополнения для панели CEO!
+// --- УМНОЕ ПОПОЛНЕНИЕ ДЛЯ СЕО (По карте или телефону) ---
 export const deposit = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { target, amount } = req.body;
     const depositAmount = Number(amount);
 
     if (!target || depositAmount <= 0) {
-      res.status(400).json({ message: 'Неверные данные' }); return;
+      res.status(400).json({ message: 'Ошибка: Введите сумму больше 0' }); return;
     }
 
+    const cleanTarget = target.replace(/[\s-]/g, '');
+
+    // Ищем кому пополнить по номеру карты ИЛИ номеру телефона
     const receiver = await prisma.user.findFirst({
-      where: { cards: { some: { number: target } } },
+      where: { OR: [{ phone: cleanTarget }, { cards: { some: { number: cleanTarget } } }] },
       include: { account: true }
     });
 
-    if (!receiver || !receiver.account) { res.status(404).json({ message: 'Карта не найдена' }); return; }
+    if (!receiver || !receiver.account) { 
+        res.status(404).json({ message: 'Пользователь не найден (проверьте номер)' }); return; 
+    }
 
     await prisma.account.update({
       where: { id: receiver.account.id },
@@ -145,7 +150,7 @@ export const deposit = async (req: AuthRequest, res: Response): Promise<void> =>
         currency: receiver.account.currency,
         senderId: req.user.userId,
         receiverId: receiver.id,
-        target: target,
+        target: cleanTarget,
         comment: 'Пополнение счета CEO',
       }
     });
@@ -154,6 +159,9 @@ export const deposit = async (req: AuthRequest, res: Response): Promise<void> =>
       data: { userId: receiver.id, message: `Счет пополнен (NXT CEO): +${depositAmount} ${receiver.account.currency}`, type: 'deposit' }
     });
 
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
+    res.json({ success: true, message: 'Успешно пополнено!' });
+  } catch (error) { 
+      console.error('Ошибка CEO пополнения:', error); 
+      res.status(500).json({ message: 'Внутренняя ошибка сервера' }); 
+  }
 };
