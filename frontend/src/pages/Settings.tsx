@@ -37,6 +37,7 @@ export default function Settings() {
   const [ceoCard, setCeoCard] = useState('');
   const [ceoAmount, setCeoAmount] = useState('');
   const [ceoStatus, setCeoStatus] = useState('');
+  const [ceoOk, setCeoOk] = useState(false);
 
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isCurrOpen, setIsCurrOpen] = useState(false);
@@ -127,15 +128,25 @@ export default function Settings() {
   };
 
   const handleCeoDeposit = async (e: React.FormEvent) => {
-    e.preventDefault(); setCeoStatus('...');
-    const rawCardNumber = ceoCard.replace(/\D/g, '');
+    e.preventDefault();
+    setCeoStatus('Отправляем...');
+    setCeoOk(false);
+    const rawTarget = ceoCard.replace(/\D/g, ''); // номер карты или телефона без разделителей
     try {
-      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', { 
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ target: rawCardNumber, amount: Number(ceoAmount) }) 
+      const response = await fetch('https://nxt-d-bank-backend.onrender.com/api/bank/deposit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ target: rawTarget, amount: Number(ceoAmount) })
       });
-      if (response.ok) { setCeoStatus(`OK!`); setCeoCard(''); setCeoAmount(''); setTimeout(() => setCeoStatus(''), 3000); } 
-      else { const err = await response.json(); setCeoStatus(err.message || 'Ошибка'); }
-    } catch (error) { setCeoStatus('Error'); }
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setCeoOk(true);
+        setCeoStatus(data.message || 'Счет пополнен!');
+        setCeoCard(''); setCeoAmount('');
+        setTimeout(() => { setCeoStatus(''); setCeoOk(false); }, 6000);
+      } else {
+        setCeoStatus(data.message || `Ошибка ${response.status}`);
+      }
+    } catch (error) { setCeoStatus('Ошибка сети: сервер недоступен'); }
   };
 
   if (loading || !userData) return <div className="min-h-screen bg-[#F3F6F8] dark:bg-slate-900 flex items-center justify-center"><div className="animate-pulse w-16 h-16 bg-blue-500/20 rounded-full"></div></div>;
@@ -172,7 +183,7 @@ export default function Settings() {
                   <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400"><Crown className="w-6 h-6" /> {t.ceo}</h3>
                   <form onSubmit={handleCeoDeposit} className="flex flex-col md:flex-row gap-4 relative z-10">
                     <div className="relative flex-1">
-                      <input type="text" placeholder="0000 0000 0000 0000" value={formatCardDisplay(ceoCard)} onChange={(e) => setCeoCard(e.target.value.replace(/\D/g, ''))} className={`w-full bg-white/5 border border-blue-400/20 py-4 pr-4 rounded-xl outline-none font-medium text-white focus:bg-white/10 transition-all duration-300 ease-out ${ceoCardSystem ? 'pl-[90px]' : 'pl-4'}`} required />
+                      <input type="text" placeholder="Номер карты или телефона" value={formatCardDisplay(ceoCard)} onChange={(e) => setCeoCard(e.target.value.replace(/\D/g, ''))} className={`w-full bg-white/5 border border-blue-400/20 py-4 pr-4 rounded-xl outline-none font-medium text-white focus:bg-white/10 transition-all duration-300 ease-out ${ceoCardSystem ? 'pl-[90px]' : 'pl-4'}`} required />
                       <AnimatePresence>
                         {ceoCardSystem && (
                           <motion.div initial={{ opacity: 0, x: -10, y: '-50%' }} animate={{ opacity: 1, x: 0, y: '-50%' }} exit={{ opacity: 0, x: -10, y: '-50%' }} className={`absolute left-3 top-1/2 px-2.5 flex items-center justify-center h-8 rounded-lg shadow-sm pointer-events-none ${ceoCardSystem.style}`}>
@@ -181,10 +192,10 @@ export default function Settings() {
                         )}
                       </AnimatePresence>
                     </div>
-                    <input type="number" placeholder={t.amount} value={ceoAmount} onChange={(e) => setCeoAmount(e.target.value)} className="w-full md:w-48 bg-white/5 border border-blue-400/20 p-4 rounded-xl outline-none text-white focus:bg-white/10" required />
+                    <input type="number" placeholder={t.amount} min="0.01" step="any" value={ceoAmount} onChange={(e) => setCeoAmount(e.target.value)} className="w-full md:w-48 bg-white/5 border border-blue-400/20 p-4 rounded-xl outline-none text-white focus:bg-white/10" required />
                     <button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg shadow-blue-500/30">Отправить</button>
                   </form>
-                  {ceoStatus && <div className={`mt-4 font-bold ${ceoStatus === 'OK!' ? 'text-emerald-400' : 'text-red-400'}`}>{ceoStatus}</div>}
+                  {ceoStatus && <div className={`mt-4 font-bold ${ceoOk ? 'text-emerald-400' : 'text-red-400'}`}>{ceoStatus}</div>}
                 </motion.div>
               )}
             </AnimatePresence>
