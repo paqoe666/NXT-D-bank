@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { apiKeyAuth } from '../../middlewares/apiAppAuth';
+import { apiKeyAuth, requireWriteScope } from '../../middlewares/apiAppAuth';
+import { writeLimiter } from '../../middlewares/rateLimiter';
+import * as money from '../../controllers/v1/moneyController';
 import * as publicV1 from '../../controllers/v1/publicController';
 import * as usersV1 from '../../controllers/v1/userReadController';
 import { getPaymentRequestByToken } from '../../controllers/paymentRequestController';
@@ -31,5 +33,10 @@ router.get('/users/:userId', apiKeyAuth, usersV1.getUser);
 router.get('/users/:userId/balance', apiKeyAuth, usersV1.getUserBalance);
 router.get('/users/:userId/cards', apiKeyAuth, usersV1.getUserCards);
 router.get('/users/:userId/transactions', apiKeyAuth, usersV1.getUserTransactions);
+
+// --- Денежные операции: нужен ключ со scope "write" и DBANK_WRITE_ENABLED=true на сервере ---
+router.post('/users/:userId/debit', apiKeyAuth, requireWriteScope, writeLimiter, money.debit);
+router.post('/users/:userId/credit', apiKeyAuth, requireWriteScope, writeLimiter, money.credit);
+router.get('/transactions/:txId', apiKeyAuth, money.getTransaction);
 
 export default router;

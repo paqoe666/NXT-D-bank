@@ -8,6 +8,8 @@ import v1Routes from './routes/v1'; // Внешний API v1 для сторон
 const prisma = new PrismaClient();
 const app = express();
 
+app.set('trust proxy', 1); // сервис стоит за прокси Render: без этого req.ip = IP балансировщика,
+                          // и rate-limit становится общим для всех пользователей
 app.use(cors());
 app.use(express.json());
 

@@ -119,6 +119,126 @@ curl https://nxt-d-bank-backend.onrender.com/api/v1/payment-requests/<token>
 Ссылка для друзей имеет вид `<ваш-фронт>/pay/<token>`: открывается без входа в банк,
 оплата — после входа. Если сумма не задана (`amount: null`), плательщик вводит свою.
 
+## 12. Денежные операции: списание и пополнение
+
+Требуется ключ со scope `write`. Права выдаются двумя фильтрами:
+1. в `NXT_API_KEYS` ключ объявлен как `имя:ключ:read|write` (по умолчанию — только `read`);
+2. на сервере выставлена переменная `DBANK_WRITE_ENABLED=true` (по умолчанию запись выключена).
+
+```
+POST /api/v1/users/:userId/debit     — списать средства со счёта
+POST /api/v1/users/:userId/credit    — зачислить средства на счёт
+GET  /api/v1/transactions/:txId      — сверка статуса операции
+```
+
+### Единицы денег
+
+`amountMinor` — **целое в минорных единицах (копейках)**: `50000` = 500,00 ₽.
+В ответе операции `amount`, `totalDeducted`, `commission` тоже в минорных единицах,
+а `balanceAfter` — в major-единицах (как в `GET /users/:id/balance`).
+В существующей ленте `GET /users/:id/transactions` суммы остаются в major-единицах — это не ломается.
+
+### Тело запроса
+
+```json
+{
+  "amountMinor": 50000,
+  "currency": "RUB",
+  "comment": "Списание за услугу",
+  "reference": "order-1042",
+  "dryRun": false
+}
+```
+
+| Поле | Правило |
+|---|---|
+| `amountMinor` | **обязательное**, целое `> 0` и `<= 100000000` |
+| `currency` | необязательное, должна совпадать с валютой счёта (иначе `422 invalid_currency`) |
+| `comment` | необязательное, до 140 символов |
+| `reference` | необязательное, до 140 символов, для сверки у клиента |
+| `dryRun` | необязательное; `true` — посчитать без применения |
+
+Заголовки: `X-API-Key` (обязательный), `Idempotency-Key` (рекомендуется), `User-Agent` (пишется в аудит).
+
+### Успех — `200`
+
+```json
+{
+  "applied": true,
+  "id": "b7c0f2de-2b1a-4f0e-9c0f-9f0a1b2c3d4e",
+  "type": "transfer", "status": "completed", "direction": "out",
+  "amount": 50000, "totalDeducted": 50000, "commission": 0,
+  "currency": "RUB", "balanceAfter": 201652049.5,
+  "failureReason": null, "processedAt": "2026-09-29T20:15:00.000Z",
+  "comment": "Списание за услугу", "reference": "order-1042",
+  "createdAt": "2026-09-29T20:15:00.000Z"
+}
+```
+
+Для `credit` — `"direction":"in"` и `"totalDeducted":0`. Операция применяется **синхронно**:
+в успешном ответе `status` всегда `completed`, а `balanceAfter` актуален на момент ответа.
+
+### Сухой прогон
+
+`"dryRun": true` — валидация и расчёт без применения: баланс, лента и записи идемпотентности не меняются.
+Ответ: `200` с `"applied": false`, `"id": null`, `"status": "pending"`, `balanceAfter` — прогноз,
+`failureReason` — `"insufficient_funds"`, если денег не хватит (в ответе также есть текущий `balance`).
+
+### Идемпотентность
+
+Заголовок `Idempotency-Key: <люч приложения>` (уникален в пределах приложения):
+
+* первый запрос применяется, его ответ сохраняется на **24 часа**;
+* повтор с тем же ключом и тем же телом → `200` и **тот же самый ответ** (заголовок `Idempotent-Replay: true`), деньги второй раз не списываются;
+* повтор с тем же ключом, но другим телом → `409 idempotency_conflict`.
+
+### Ошибки
+
+| HTTP | `error.code` | Когда |
+|---|---|---|
+| 401 | `invalid_api_key` | нет ключа или ключ не найден |
+| 403 | `forbidden_scope` | ключ без `write` или `DBANK_WRITE_ENABLED` не выставлена |
+| 404 | `user_not_found` | пользователя нет, нет счёта, или `userId` не uuid |
+| 404 | `transaction_not_found` | операции с таким id нет |
+| 409 | `idempotency_conflict` | тот же `Idempotency-Key` с другим телом |
+| 422 | `invalid_amount` | `amountMinor` не целое / `<= 0` / `> 100000000` |
+| 422 | `invalid_currency` | валюта запроса не совпадает с валютой счёта |
+| 422 | `invalid_comment` / `invalid_reference` / `invalid_idempotency_key` | длиннее лимита |
+| 422 | `insufficient_funds` | денег не хватает; в теле дополнительно `balance` и `balanceAfter` |
+| 423 | `account_blocked` | счёт заблокирован (`Account.isBlocked`) |
+| 429 | `too_many_requests` | превышен `WRITE_RATE_MAX` операций в минуту **на ключ** |
+
+### Примеры
+
+```bash
+# Списание 500,00 ₽
+curl -X POST "https://nxt-d-bank-backend.onrender.com/api/v1/users/$USER_ID/debit" \
+  -H "X-API-Key: $KEY" -H "Idempotency-Key: order-1042" -H "Content-Type: application/json" \
+  -d '{"amountMinor":50000,"comment":"Списание за услугу","reference":"order-1042"}'
+
+# Пополнение на 250,00 ₽
+curl -X POST "https://nxt-d-bank-backend.onrender.com/api/v1/users/$USER_ID/credit" \
+  -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+  -d '{"amountMinor":25000,"reference":"topup-77"}'
+
+# Проверить, что можно, ничего не применяя
+curl -X POST "https://nxt-d-bank-backend.onrender.com/api/v1/users/$USER_ID/debit" \
+  -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+  -d '{"amountMinor":50000,"dryRun":true}'
+
+# Сверка после таймаута
+curl "https://nxt-d-bank-backend.onrender.com/api/v1/transactions/$TX_ID" -H "X-API-Key: $KEY"
+```
+
+### Аудит и гарантии
+
+* Списание/зачисление выполняются одной транзакцией БД с условным `UPDATE ... WHERE balance >= amount`,
+  поэтому параллельные запросы не уводят баланс в минус и не теряют обновления.
+* Каждая попытка операции пишется в таблицу `ApiAuditLog`: `txId`, `userId`, сумма, валюта, `direction`,
+  имя приложения, **префикс ключа и его sha256** (сам секрет не хранится), `ip`, `User-Agent`,
+  код ответа, результат (`applied` / `replayed` / `dry_run` / код ошибки) и длительность.
+* Пан, CVV, ПИН и реальные рельсы не передаются и не хранятся — проект учебный, деньги фейковые.
+
 ## Жизненный цикл операции (статусы)
 
 | Статус | Что значит |

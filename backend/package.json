@@ -152,7 +152,8 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev src/server.ts",
     "db:gen": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "test:api": "tsx scripts/api-v1-money.test.ts"
   },
   "keywords": [],
   "author": "",

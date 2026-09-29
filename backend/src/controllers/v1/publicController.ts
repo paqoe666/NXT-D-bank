@@ -15,22 +15,38 @@ export const getIndex = (_req: Request, res: Response): void => {
     mode: 'Учебная песочница: деньги фейковые, реальные платежи невозможны',
     auth: {
       public: 'без авторизации',
-      userData: 'заголовок X-API-Key (ключ выдает владелец банка)'
+      userData: 'заголовок X-API-Key (ключ выдает владелец банка)',
+      money: 'заголовок X-API-Key у ключа со scope "write" (формат ключа в NXT_API_KEYS: имя:ключ:read|write) + переменная DBANK_WRITE_ENABLED=true на сервере'
     },
     endpoints: {
       public: [
         'GET /api/v1/health',
         'GET /api/v1/bins',
         'GET /api/v1/bins/:bin',
-        'POST /api/v1/cards/validate'
+        'POST /api/v1/cards/validate',
+        'GET /api/v1/rates',
+        'GET /api/v1/payment-requests/:token'
       ],
       withApiKey: [
         'GET /api/v1/users/lookup?target=',
         'GET /api/v1/users/:userId',
         'GET /api/v1/users/:userId/balance',
         'GET /api/v1/users/:userId/cards',
-        'GET /api/v1/users/:userId/transactions?limit=&cursor='
+        'GET /api/v1/users/:userId/transactions?limit=&cursor=',
+        'GET /api/v1/transactions/:txId'
+      ],
+      withApiKeyWriteScope: [
+        'POST /api/v1/users/:userId/debit',
+        'POST /api/v1/users/:userId/credit'
       ]
+    },
+    money: {
+      units: 'amountMinor — ЦЕЛОЕ в минорных единицах (копейках): 50000 = 500,00 ₽. Ответ операции отдаёт amount/totalDeducted/commission тоже в минорных единицах, а balanceAfter — в major-единицах (как в GET /users/:id/balance). В БД (ленте операций) суммы остаются в major-единицах.',
+      request: { amountMinor: 'целое > 0 и <= 100000000', currency: 'опционально, должна совпадать с валютой счета', comment: 'опционально, до 140 символов', reference: 'опционально, до 140 символов, для сверки у клиента', dryRun: 'опционально, true = посчитать без применения (ответ с applied:false)' },
+      limits: 'WRITE_RATE_MAX операций записи в минуту НА КЛЮЧ (по умолчанию 20). Заголовки x-ratelimit-limit/remaining/reset.',
+      idempotency: 'Заголовок Idempotency-Key: повтор с тем же ключом и тем же телом возвращает тот же ответ (заголовок Idempotent-Replay: true) и второй раз деньги не списывает; с тем же ключом, но другим телом — 409 idempotency_conflict. Записи хранятся 24 часа.',
+      sync: 'Операции применяются синхронно: в успешном ответе status=completed, balanceAfter актуален. dryRun всегда возвращает status=pending и applied=false.',
+      errors: ['invalid_api_key 401', 'forbidden_scope 403', 'user_not_found 404', 'transaction_not_found 404', 'idempotency_conflict 409', 'invalid_amount 422', 'invalid_currency 422', 'insufficient_funds 422', 'account_blocked 423', 'too_many_requests 429']
     },
     security: 'Наружу уходят только маскированные данные: номер карты (**** **** **** 1234) и CVV никогда не покидают банк'
   });

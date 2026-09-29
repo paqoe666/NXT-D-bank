@@ -38,6 +38,7 @@ model Account {
   id       String @id @default(uuid())
   balance  Float  @default(0)
   held     Float  @default(0) // зарезервировано под незавершенные операции (pending/processing)
+  isBlocked Boolean @default(false) // счет заблокирован: внешние операции запрещены (423)
   currency String @default("RUB") // RUB, USD, EUR
   userId   String @unique
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -70,6 +71,9 @@ model Transaction {
   failureReason String?   // причина отказа: recipient_not_found, insufficient_funds_on_recipient и т.п.
   processedAt   DateTime? // когда операция завершилась (успешно или нет)
   refundOfId    String?   // id исходной операции, если это возврат средств
+  reference     String?   // внешний идентификатор операции (order-1042 и т.п.) — заполняет API v1
+  appName       String?   // какое приложение создало операцию через API v1
+  balanceAfter  Float?    // остаток после операции (major-единицы), заполняет API v1
   
   senderId      String?
   sender        User?    @relation("Sender", fields: [senderId], references: [id])
@@ -112,4 +116,45 @@ model PaymentRequest {
 
   expiresAt  DateTime?          // необязательный срок действия
   createdAt  DateTime @default(now())
+}
+
+// Идемпотентность операций API v1: повтор с тем же ключом возвращает тот же ответ
+model IdempotencyRecord {
+  id            String   @id @default(uuid())
+  key           String              // значение заголовка Idempotency-Key от клиента
+  appName       String              // приложение, выполнившее запрос (ключ уникален в пределах приложения)
+  operation     String              // 'debit' | 'credit'
+  userId        String
+  bodyHash      String              // sha256 канонизированного тела запроса
+  amountMinor   Int
+  currency      String
+  responseJson  String?             // сохранённый ответ для повторного возврата
+  transactionId String?
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime            // минимум 24 часа с момента создания
+
+  @@unique([appName, key])
+  @@index([expiresAt])
+}
+
+// Аудит операций API v1: по записи на каждое обращение (успех и ошибка)
+model ApiAuditLog {
+  id          String   @id @default(uuid())
+  appName     String?
+  keyPrefix   String?  // первые символы ключа (секрет не логируем целиком)
+  keyHash     String?  // sha256 ключа
+  operation   String
+  userId      String?
+  txId        String?
+  amountMinor Int?
+  currency    String?
+  direction   String?
+  ip          String?
+  userAgent   String?
+  statusCode  Int
+  result      String   // 'applied' | 'replayed' | 'dry_run' | код ошибки
+  durationMs  Int?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
 }
