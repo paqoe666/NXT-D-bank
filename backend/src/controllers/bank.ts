@@ -56,39 +56,21 @@ export const updateCurrency = async (req: AuthRequest, res: Response): Promise<v
     const oldCurrency = account.currency;
     if (oldCurrency === newCurrency) { res.json({ success: true }); return; }
 
-    // КУРСЫ ВАЛЮТ (относительно Рубля)
     const rates: Record<string, number> = {
-      'RUB': 1,
-      'USD': 80,
-      'EUR': 100,
-      'GBP': 120, // Британский фунт
-      'UAH': 2.5, // Украинская гривна
-      'CNY': 12,  // Китайский юань
-      'CHF': 110, // Швейцарский франк
-      'JPY': 0.6, // Японская иена
-      'BYN': 30,  // Белорусский рубль
-      'AED': 22,  // Дирхам ОАЭ
-      'KZT': 0.2  // Казахстанский тенге
+      'RUB': 1, 'USD': 80, 'EUR': 100, 'GBP': 120, 'UAH': 2.5,
+      'CNY': 12, 'CHF': 110, 'JPY': 0.6, 'BYN': 30, 'AED': 22, 'KZT': 0.2
     };
 
     const rateOld = rates[oldCurrency] || 1;
     const rateNew = rates[newCurrency] || 1;
 
-    // Сначала переводим старый баланс в рубли, а затем в новую валюту
     let balanceInRub = account.balance * rateOld;
     let newBalance = balanceInRub / rateNew;
 
     newBalance = Math.round(newBalance * 100) / 100;
-    
-    await prisma.account.update({ 
-      where: { userId }, 
-      data: { currency: newCurrency, balance: newBalance } 
-    });
-    
+    await prisma.account.update({ where: { userId }, data: { currency: newCurrency, balance: newBalance } });
     res.json({ success: true });
-  } catch (error) { 
-    res.status(500).json({ message: 'Ошибка сервера' }); 
-  }
+  } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };
 
 export const updatePassword = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -123,23 +105,55 @@ export const resolveRecipient = async (req: AuthRequest, res: Response): Promise
   } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };
 
-// --- НОВЫЙ МЕТОД СОХРАНЕНИЯ ИМЕНИ КАРТЫ ---
-// --- ОБНОВЛЕННЫЙ МЕТОД СОХРАНЕНИЯ НАЗВАНИЯ КАРТЫ ---
 export const updateCardName = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { cardId, cardName } = req.body;
-    if (!cardId || !cardName) { 
-      res.status(400).json({ message: 'Нет данных' }); 
-      return; 
-    }
-    
-    await prisma.card.update({ 
-      where: { id: cardId }, 
-      data: { cardName } // Сохраняем любое слово, даже с маленькой буквы
-    });
-    
+    if (!cardId || !cardName) { res.status(400).json({ message: 'Нет данных' }); return; }
+    await prisma.card.update({ where: { id: cardId }, data: { cardName } });
     res.json({ success: true });
-  } catch (error) { 
-    res.status(500).json({ message: 'Ошибка сервера' }); 
-  }
+  } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
+};
+
+// ИСПРАВЛЕНИЕ: Вернули функцию пополнения для панели CEO!
+export const deposit = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { target, amount } = req.body;
+    const depositAmount = Number(amount);
+
+    if (!target || depositAmount <= 0) {
+      res.status(400).json({ message: 'Неверные данные' }); return;
+    }
+
+    const receiver = await prisma.user.findFirst({
+      where: { cards: { some: { number: target } } },
+      include: { account: true }
+    });
+
+    if (!receiver || !receiver.account) { res.status(404).json({ message: 'Карта не найдена' }); return; }
+
+    await prisma.account.update({
+      where: { id: receiver.account.id },
+      data: { balance: receiver.account.balance + depositAmount }
+    });
+
+    await prisma.transaction.create({
+      data: {
+        type: 'deposit',
+        status: 'completed',
+        amount: depositAmount,
+        totalDeducted: depositAmount,
+        currency: receiver.account.currency,
+        senderId: req.user.userId,
+        receiverId: receiver.id,
+        target: target,
+        comment: 'Пополнение счета CEO',
+      }
+    });
+
+    await prisma.notification.create({
+      data: { userId: receiver.id, message: `Счет пополнен (NXT CEO): +${depositAmount} ${receiver.account.currency}`, type: 'deposit' }
+    });
+
+    res.json({ success: true });
+  } catch (error) { res.status(500).json({ message: 'Ошибка сервера' }); }
 };

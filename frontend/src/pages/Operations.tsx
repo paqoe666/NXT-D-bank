@@ -8,7 +8,8 @@ import { jsPDF } from 'jspdf';
 
 const translations: Record<string, any> = {
   ru: { dash: 'Главная', hist: 'Операции', set: 'Настройки', title: 'История операций', income: 'Пополнения и доходы', expense: 'Расходы и переводы', all: 'Все', incomes: 'Доходы', expenses: 'Расходы', searchText: 'Поиск операции...', listTitle: 'Список транзакций', notFound: 'Операции не найдены', clearHistory: 'Очистить историю', confirmClear: 'Вы уверены, что хотите удалить всю историю транзакций?', unknown: 'Неизвестный получатель', err: 'ОШИБКА', comm: 'Ком.', simNote: 'Учебный симулятор', success: 'Успешно', fail: 'Возврат / Ошибка', opId: 'ID Операции', dateTime: 'Дата и время', sender: 'Отправитель', receiver: 'Получатель', commission: 'Комиссия', comment: 'Комментарий', close: 'Закрыть', ceoDeposit: 'Пополнение счета CEO', repeat: 'Повторить перевод', downloadPdf: 'Скачать квитанцию (PDF)' },
-  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Transaction History', income: 'Deposits & Income', expense: 'Expenses & Transfers', all: 'All', incomes: 'Income', expenses: 'Expenses', searchText: 'Search transaction...', listTitle: 'Transactions List', notFound: 'No transactions found', clearHistory: 'Clear history', confirmClear: 'Are you sure you want to delete all transaction history?', unknown: 'Unknown recipient', err: 'ERROR', comm: 'Fee', simNote: 'Training Simulator', success: 'Success', fail: 'Refund / Error', opId: 'Operation ID', dateTime: 'Date & Time', sender: 'Sender', receiver: 'Receiver', commission: 'Fee', comment: 'Comment', close: 'Close', ceoDeposit: 'CEO Account Deposit', repeat: 'Repeat transfer', downloadPdf: 'Download PDF' }
+  en: { dash: 'Dashboard', hist: 'History', set: 'Settings', title: 'Transaction History', income: 'Deposits & Income', expense: 'Expenses & Transfers', all: 'All', incomes: 'Income', expenses: 'Expenses', searchText: 'Search transaction...', listTitle: 'Transactions List', notFound: 'No transactions found', clearHistory: 'Clear history', confirmClear: 'Are you sure you want to delete all transaction history?', unknown: 'Unknown recipient', err: 'ERROR', comm: 'Fee', simNote: 'Training Simulator', success: 'Success', fail: 'Refund / Error', opId: 'Operation ID', dateTime: 'Date & Time', sender: 'Sender', receiver: 'Receiver', commission: 'Fee', comment: 'Comment', close: 'Close', ceoDeposit: 'CEO Account Deposit', repeat: 'Repeat transfer', downloadPdf: 'Download PDF' },
+  es: { dash: 'Inicio', hist: 'Operaciones', set: 'Ajustes', title: 'Historial de Transacciones', income: 'Depósitos', expense: 'Gastos', all: 'Todo', incomes: 'Ingresos', expenses: 'Gastos', searchText: 'Buscar...', listTitle: 'Lista de Transacciones', notFound: 'No se encontraron operaciones', clearHistory: 'Borrar historial', confirmClear: '¿Eliminar historial?', unknown: 'Desconocido', err: 'ERROR', comm: 'Com.', simNote: 'Simulador', success: 'Éxito', fail: 'Error', opId: 'ID de Operación', dateTime: 'Fecha y Hora', sender: 'Remitente', receiver: 'Destinatario', commission: 'Comisión', comment: 'Comentario', close: 'Cerrar', ceoDeposit: 'Depósito CEO', repeat: 'Repetir', downloadPdf: 'Descargar PDF' }
 };
 
 export default function Operations() {
@@ -27,7 +28,12 @@ export default function Operations() {
   const receiptRef = useRef<HTMLDivElement>(null);
 
   const t = translations[language] || translations.ru;
-  const rates: Record<string, number> = { 'RUB': 1, 'USD': 80, 'EUR': 100 };
+  
+  // ИСПРАВЛЕНИЕ: Добавлены ВСЕ 11 валют, чтобы история не сходила с ума
+  const rates: Record<string, number> = { 
+    'RUB': 1, 'USD': 80, 'EUR': 100, 'GBP': 120, 'UAH': 2.5, 
+    'CNY': 12, 'CHF': 110, 'JPY': 0.6, 'BYN': 30, 'AED': 22, 'KZT': 0.2 
+  };
 
   const myId = userData?.account?.userId;
   const currentCurrency = userData?.account?.currency || 'RUB';
@@ -38,7 +44,6 @@ export default function Operations() {
     return isNaN(num) ? String(val) : num.toLocaleString('ru-RU');
   };
 
-  // Хелпер для определения платежной системы по номеру
   const getCardSystem = (cardNumber: string) => {
     if (!cardNumber) return null;
     const cleanNum = cardNumber.replace(/\D/g, '');
@@ -50,7 +55,6 @@ export default function Operations() {
     return null;
   };
 
-  // Умное форматирование участника (Имя Фамилия • 1234 (МИР))
   const formatParticipant = (userObj: any, isMe: boolean, target: string, isReceiver: boolean) => {
     let name = userObj ? `${userObj.firstName} ${userObj.lastName}` : (isReceiver ? target : 'NXT-D Bank');
     if (!userObj && !isReceiver) name = 'NXT-D Bank';
@@ -81,7 +85,7 @@ export default function Operations() {
     const rateCurrent = rates[currentCurrency] || 1;
 
     const amount = Number(tx.amount) || 0;
-    const commission = Number(tx.commission) || 0;
+    const commission = Number(tx.commission) || (Number(tx.totalDeducted) - Number(tx.amount)) || 0;
 
     const amountInRub = amount * rateTx;
     const commInRub = commission * rateTx;
@@ -377,7 +381,6 @@ export default function Operations() {
                   <span className="font-medium text-right text-slate-900 dark:text-white">{formatDate(selectedTx.createdAt)}</span>
                 </div>
                 
-                {/* УМНЫЙ ОТПРАВИТЕЛЬ С КАРТОЙ */}
                 <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
                   <span className="text-slate-500 shrink-0">{t.sender}</span>
                   <span className="font-medium text-right text-slate-900 dark:text-white break-words pl-2">
@@ -385,7 +388,6 @@ export default function Operations() {
                   </span>
                 </div>
                 
-                {/* УМНЫЙ ПОЛУЧАТЕЛЬ С КАРТОЙ */}
                 <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
                   <span className="text-slate-500 shrink-0">{t.receiver}</span>
                   <span className="font-medium text-right text-slate-900 dark:text-white break-words pl-2">
@@ -396,7 +398,7 @@ export default function Operations() {
                 {selectedTx.finalComm > 0 && (
                   <div className="flex justify-between items-center border-b border-dashed border-slate-200 dark:border-slate-700 pb-1.5">
                     <span className="text-slate-500">{t.commission}</span>
-                    <span className="font-medium text-right text-slate-900 dark:text-white">{formatMoney(selectedTx.finalComm)} {currentCurrency}</span>
+                    <span className="font-medium text-right text-amber-500">{formatMoney(selectedTx.finalComm)} {currentCurrency}</span>
                   </div>
                 )}
                 {selectedTx.comment && (
