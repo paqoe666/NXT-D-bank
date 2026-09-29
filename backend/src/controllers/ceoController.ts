@@ -1,16 +1,9 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import { findUserByAnyTarget, onlyDigits } from '../services/lookup.service';
 
 const prisma = new PrismaClient();
-
-// Телефон в БД может быть записан в свободном формате («+7 999 000-00-00»).
-// Готовим все вероятные варианты, чтобы поиск сработал в любом случае.
-const phoneCandidates = (raw: string): string[] => {
-  const withoutSpaces = raw.replace(/[\s\-()]/g, '');
-  const digits = withoutSpaces.replace(/\D/g, '');
-  return Array.from(new Set([withoutSpaces, digits, digits ? `+${digits}` : ''].filter(Boolean)));
-};
 
 export const ceoDeposit = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -32,28 +25,10 @@ export const ceoDeposit = async (req: AuthRequest, res: Response): Promise<void>
     }
 
     const target = String(rawTarget).trim();
-    const candidates = phoneCandidates(target);
-    const digitsOnly = target.replace(/\D/g, '');
+    const digitsOnly = onlyDigits(target);
 
-    // 2. Ищем получателя по номеру карты ИЛИ телефону (быстрый путь — по индексам)
-    let receiver = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { phone: { in: candidates } },
-          { cards: { some: { number: digitsOnly || target } } }
-        ]
-      },
-      include: { account: true }
-    });
-
-    // Запасной путь: телефон записан в свободном формате, поэтому сравниваем только цифры
-    if (!receiver && digitsOnly.length >= 6) {
-      const allUsers = await prisma.user.findMany({ select: { id: true, phone: true } });
-      const match = allUsers.find((u) => u.phone.replace(/\D/g, '') === digitsOnly);
-      if (match) {
-        receiver = await prisma.user.findUnique({ where: { id: match.id }, include: { account: true } });
-      }
-    }
+    // 2. Ищем получателя по номеру карты, телефону или id (общий сервис поиска)
+    const receiver = await findUserByAnyTarget(target);
 
     if (!receiver) {
       res.status(404).json({ message: 'Получатель не найден: проверьте номер карты или телефона' });
