@@ -12,6 +12,7 @@ import {
 } from '../controllers/bank';
 import { transferMoney, getHistory, clearHistory, cancelTransfer, refundTransfer } from '../controllers/transaction';
 import { ceoDeposit } from '../controllers/ceoController';
+import { createPaymentRequest, getMyPaymentRequests, cancelPaymentRequest, payPaymentRequest } from '../controllers/paymentRequestController';
 import { authenticateToken } from '../middlewares/authMiddleware';
 import { connectStream } from '../controllers/streamController';
 import { transferLimiter } from '../middlewares/rateLimiter';
@@ -36,5 +37,11 @@ router.post('/password', updatePassword);
 router.post('/card/name', updateCardName);
 router.get('/limits', getTransferLimits);
 router.post('/limits', updateTransferLimits);
+
+// Запросы денег по ссылке/QR
+router.get('/requests', getMyPaymentRequests);
+router.post('/requests', createPaymentRequest);
+router.post('/requests/:id/cancel', cancelPaymentRequest);
+router.post('/requests/pay/:token', transferLimiter, payPaymentRequest);
 
 export default router;

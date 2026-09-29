@@ -1,9 +1,8 @@
 import { Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { findUserByAnyTarget } from '../services/lookup.service';
 import { TX_STATUS, processDueTransfers, cancelTransfer as cancelReservedTransfer, convertCurrency } from '../services/ledger.service';
-import { checkTransferLimit } from '../services/limits.service';
+import { createTransfer } from '../services/transfer.service';
 
 
 // Тексты статусов для сообщений пользователю
@@ -77,97 +76,32 @@ export const clearHistory = async (req: AuthRequest, res: Response): Promise<voi
   }
 };
 
+
 export const transferMoney = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { target: rawTarget, receiverPhone, amount, comment } = req.body;
     const target = rawTarget || receiverPhone;
-    const senderId = req.user.userId;
-    const transferAmount = Math.round(Number(amount) * 100) / 100;
 
-    if (!target || !Number.isFinite(transferAmount) || transferAmount <= 0) {
-      res.status(400).json({ message: 'Неверные данные для перевода' });
+    // Вся логика денег (лимиты, резерв, статусы) — в одном сервисе createTransfer
+    const result = await createTransfer({ senderId: req.user.userId, target, amount: Number(amount), comment });
+    if (!result.ok) {
+      res.status(result.status).json({ message: result.message });
       return;
     }
-
-    const sender = await prisma.user.findUnique({ where: { id: senderId }, include: { account: true } });
-    if (!sender || !sender.account) {
-      res.status(404).json({ message: 'Отправитель не найден' });
-      return;
-    }
-
-    const receiver = await findUserByAnyTarget(String(target));
-    if (!receiver || !receiver.account) {
-      res.status(404).json({ message: 'Получатель не найден' });
-      return;
-    }
-
-    if (sender.id === receiver.id) {
-      res.status(400).json({ message: 'Нельзя переводить средства самому себе' });
-      return;
-    }
-
-    const cleanTarget = String(target).replace(/[\s-]/g, '');
-    const senderAccountId = sender.account.id;
-    const senderCurrency = sender.account.currency;
-
-    // 1. В одной транзакции: проверяем лимиты, резервируем деньги и создаем операцию в статусе pending.
-    // Условный updateMany (balance >= amount) защищает от гонок: два одновременных перевода
-    // не смогут списать больше, чем есть на счете, и не обойдут лимит.
-    const result = await prisma.$transaction(async (db) => {
-      const limitError = await checkTransferLimit(db, senderId, transferAmount);
-      if (limitError) return { limitError };
-
-      const reserved = await db.account.updateMany({
-        where: { id: senderAccountId, balance: { gte: transferAmount } },
-        data: { balance: { decrement: transferAmount }, held: { increment: transferAmount } }
-      });
-      if (reserved.count === 0) return { insufficient: true };
-
-      const created = await db.transaction.create({
-        data: {
-          type: 'transfer',
-          status: TX_STATUS.pending,
-          amount: transferAmount,
-          totalDeducted: transferAmount,
-          currency: senderCurrency,
-          senderId: sender.id,
-          receiverId: receiver.id,
-          target: cleanTarget,
-          comment: comment || 'Перевод средств'
-        }
-      });
-
-      return { created };
-    });
-
-    if ('limitError' in result) {
-      res.status(400).json({ message: result.limitError });
-      return;
-    }
-
-    if ('insufficient' in result) {
-      res.status(400).json({ message: `Недостаточно средств. Доступно: ${sender.account.balance} ${senderCurrency}` });
-      return;
-    }
-
-    const created = result.created;
-
-    await prisma.notification.create({
-      data: {
-        userId: sender.id,
-        type: 'transfer_out',
-        message: `Перевод ${transferAmount} ${sender.account.currency} принят в обработку.`
-      }
-    });
-
-    // 2. Сразу пробуем продвинуть операцию: если задержки отключены, она завершится мгновенно
-    await processDueTransfers();
-    const fresh = await prisma.transaction.findUnique({ where: { id: created.id } });
 
     res.json({
       success: true,
-      message: `Перевод принят. Статус: ${statusText(fresh ? fresh.status : created.status)}`,
-      transaction: txView(fresh || created)
+      message: `Перевод принят. Статус: ${statusText(result.status)}`,
+      transaction: {
+        id: result.transactionId,
+        type: 'transfer',
+        status: result.status,
+        amount: result.amount,
+        currency: result.currency,
+        failureReason: null,
+        processedAt: null,
+        createdAt: result.createdAt
+      }
     });
   } catch (error) {
     console.error('Ошибка перевода:', error);

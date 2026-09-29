@@ -29,6 +29,7 @@ model User {
   sentTx        Transaction[] @relation("Sender")
   receivedTx    Transaction[] @relation("Receiver")
   notifications Notification[]
+  paymentRequests PaymentRequest[]
   
   createdAt DateTime @default(now())
 }
@@ -91,4 +92,24 @@ model Notification {
   userId        String
   transactionId String?  // <-- ДОБАВИЛИ ЭТУ СТРОКУ
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Запрос денег по ссылке/QR: «скинь 500 ₽ на кофе».
+// Ссылку можно разослать, по ней платят один или несколько раз.
+model PaymentRequest {
+  id         String   @id @default(uuid())
+  token      String   @unique   // публичный токен из ссылки (случайный, не перебирается)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount     Float?            // null = «сколько угодно» (свободная сумма)
+  currency   String   @default("RUB")
+  title      String?           // назначение платежа
+  status     String   @default("active")  // 'active' | 'paid' | 'canceled'
+
+  paidCount  Int      @default(0)  // сколько раз оплатили
+  paidAmount Float    @default(0)  // сколько всего собрано (в валюте запроса)
+
+  expiresAt  DateTime?          // необязательный срок действия
+  createdAt  DateTime @default(now())
 }

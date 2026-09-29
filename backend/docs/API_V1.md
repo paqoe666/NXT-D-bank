@@ -101,6 +101,24 @@ curl "https://nxt-d-bank-backend.onrender.com/api/v1/users/<userId>/transactions
 ```
 Параметры: `limit` (по умолчанию 20, максимум 100), `cursor` (значение `nextCursor` из предыдущего ответа).
 
+### 10. Курсы валют банка (без ключа)
+```bash
+curl https://nxt-d-bank-backend.onrender.com/api/v1/rates
+# {"base":"RUB","rates":{"RUB":1,"USD":80,"EUR":100,"GBP":120,"UAH":2.5,"CNY":12,"CHF":110,"JPY":0.6,"BYN":30,"AED":22,"KZT":0.2},"updatedAt":"..."}
+```
+
+### 11. Запрос денег по ссылке (без ключа)
+```bash
+curl https://nxt-d-bank-backend.onrender.com/api/v1/payment-requests/<token>
+```
+```json
+{ "amount": 500, "currency": "RUB", "title": "На кофе", "status": "active",
+  "paidCount": 0, "paidAmount": 0, "remaining": 500,
+  "requesterName": "Vladislav V.", "expired": false }
+```
+Ссылка для друзей имеет вид `<ваш-фронт>/pay/<token>`: открывается без входа в банк,
+оплата — после входа. Если сумма не задана (`amount: null`), плательщик вводит свою.
+
 ## Жизненный цикл операции (статусы)
 
 | Статус | Что значит |

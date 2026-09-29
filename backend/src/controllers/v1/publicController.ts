@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
 import { BIN_REGISTRY, findBin, detectBin, luhnCheck, maskCardNumber, normalizeCardNumber } from '../../services/bin.service';
+import { CURRENCY_RATES } from '../../services/ledger.service';
+
+// Курсы валют банка: за единицу валюты сколько рублей
+export const getRates = (_req: Request, res: Response): void => {
+  res.json({ base: 'RUB', rates: CURRENCY_RATES, updatedAt: new Date().toISOString() });
+};
 
 // Корневой эндпоинт: краткая справка, чтобы внешнему разработчику было понятно, что тут есть
 export const getIndex = (_req: Request, res: Response): void => {

@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 import { apiKeyAuth } from '../../middlewares/apiAppAuth';
 import * as publicV1 from '../../controllers/v1/publicController';
 import * as usersV1 from '../../controllers/v1/userReadController';
+import { getPaymentRequestByToken } from '../../controllers/paymentRequestController';
 
 const router = Router();
 
@@ -21,6 +22,8 @@ router.get('/health', publicV1.getHealth);
 router.get('/bins', publicV1.listBins);
 router.get('/bins/:bin', publicV1.getBin);
 router.post('/cards/validate', publicV1.validateCard);
+router.get('/rates', publicV1.getRates);
+router.get('/payment-requests/:token', getPaymentRequestByToken);
 
 // --- Данные пользователя (только с ключом приложения, только чтение) ---
 router.get('/users/lookup', apiKeyAuth, usersV1.lookupUser);

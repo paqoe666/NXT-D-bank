@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Operations from './pages/Operations';
 import Settings from './pages/Settings'; 
+import PayRequest from './pages/PayRequest';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = useStore((state) => state.token);
@@ -98,6 +99,9 @@ function App() {
   const theme = useStore((state) => state.theme);
   const token = useStore((state) => state.token);
 
+  // После входа возвращаем пользователя туда, откуда он пришел (например, на страницу оплаты запроса)
+  const nextPath = new URLSearchParams(window.location.search).get('next') || '/dashboard';
+
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -111,7 +115,8 @@ function App() {
       <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100">
         <GlobalNotifications />
         <Routes>
-          <Route path="/login" element={token ? <Navigate to="/dashboard" replace /> : <Login />} />
+          <Route path="/login" element={token ? <Navigate to={nextPath} replace /> : <Login />} />
+          <Route path="/pay/:token" element={<PayRequest />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><Operations /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
